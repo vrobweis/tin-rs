@@ -24,18 +24,21 @@ struct Scene {
 impl TScene for Scene {
 
     fn setup(&mut self) {
-        println!("Scene::setup");
-        Tin::background(0.5, 0.5, 0.5);
+        eprintln!("Scene::setup");
+        
     }
 
     fn update(&mut self) {
-        println!("Scene::update");
-        const rateOfChange: f64 = 0.001;
+        eprintln!("Scene::update");
+        const RATE_OF_CHANGE: f64 = 0.001;
 
+        Tin::background(0.5, 0.5, 0.5);
+        
         let color: TinColor = TinColor::new_from_rgba(1.0, 0.1, 0.1, 1.0);
         Tin::fillColor_from_color(&color);
-        Tin::triangle(-0.3 + self.timeElapsed, -0.3, 0.0, 1.0 + self.timeElapsed, 0.3, -0.3);
-        self.timeElapsed = self.timeElapsed - rateOfChange;
+        Tin::rect(&-0.9, &-0.9, &1.0, &1.0);
+        //Tin::triangle(-0.3 + self.timeElapsed, -0.3, 0.0, 1.0 + self.timeElapsed, 0.3, -0.3);
+        self.timeElapsed = self.timeElapsed - RATE_OF_CHANGE;
     }
 }
 
@@ -44,14 +47,14 @@ fn main() {
     let frame = TinFrame::new(600, 500);
 
     let scene = Box::new(Scene{timeElapsed: 0.0});
-    let mut AViewToUse = Box::new(TinView::new(frame));
+    let mut AViewToUse = Box::new(TinView::new("title", frame));
     AViewToUse.present(scene);
 
     let controller = Box::new(TinController::new(AViewToUse));
 
     
 
-    let mut app = TinApp::App::new_with_controller("title", controller);
+    let mut app = TinApp::App::new_with_controller(controller);
 
     std::process::exit(
         match app.run() {

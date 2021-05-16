@@ -14,9 +14,13 @@ use super::{Double, Float};
 use super::{Calculation::sqrt};
 use super::Calculation;
 
+
+// TODO: Implement unit tests for TVector2
+
 /**
  A structure to represent a two dimensional vector.
- */
+*/
+#[derive(Debug, Clone, Copy)]
 pub struct TVector2 {
     pub x: Double,
     pub y: Double
@@ -24,6 +28,7 @@ pub struct TVector2 {
 }
 
 #[allow(dead_code)]
+
 impl TVector2 {
 
     // MARK: - Initializers
@@ -77,7 +82,13 @@ impl TVector2 {
     
     
 
-    
+    pub fn perpendicular_clockwise(&self) -> TVector2 {
+        return TVector2::new_from_xy(self.y, -self.x);
+    }
+
+    pub fn perpendicular_counterclockwise(&self) -> TVector2 {
+        return TVector2::new_from_xy(-self.y, self.x);
+    }
     
     // MARK: - Instance methods
     
@@ -207,6 +218,7 @@ impl std::ops::Neg for TVector2 {
         Self {x: -self.x, y: -self.y}
     }
 }
+
 
 
 // MARK: - Operators

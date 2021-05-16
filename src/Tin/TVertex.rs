@@ -60,7 +60,7 @@ impl TinVertex {
         };
 
         Self{
-            position: VertexPosition::new([point.x, point.y]),
+            position: VertexPosition::new([point.x as Float, point.y as Float]),
             color: VertexRGB::new(new_color)
         }
     }

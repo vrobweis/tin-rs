@@ -24,10 +24,12 @@ trait TViewDelegate {
 
 
 pub struct TinView {
+    title: &'static str,
     //timer: Timer,
     Target_Framerate: u16,
     pub Is_Running: bool,
 
+    
 
 
     frame: TinFrame,
@@ -39,8 +41,9 @@ impl TinView  {
     // MARK: - initializers
     
     /// TODO: Document this method.
-    pub fn new<'n>(frame: TinFrame) -> TinView {
+    pub fn new<'n>(title: &'static str, frame: TinFrame) -> TinView {
         Self {
+            title: title,
             Target_Framerate: 60 as u16,
             Is_Running: true,
             frame: frame,
@@ -51,10 +54,10 @@ impl TinView  {
     }
     
     /// TODO: Document this method.
-    pub fn new_from_dimensions(width: u32, height: u32) -> Self {
+    pub fn new_from_dimensions(title: &'static str, width: u32, height: u32) -> Self {
         //let newFrame = NSRect(x: 0.0, y: 0.0, width: width, height: height);
         let frame = TinFrame::new(width, height);
-        Self::new(frame)
+        Self::new(title, frame)
     }
 
 }
@@ -82,6 +85,8 @@ pub trait TView  {
     fn set_fps(&mut self, fps: u16); 
     
     fn get_dimensions(&self) -> TinFrame;
+
+    fn get_title(&self) -> &str;
 }
 
 impl TView for TinView {
@@ -140,6 +145,10 @@ impl TView for TinView {
 
     fn get_dimensions(&self) -> TinFrame {
         self.frame
+    }
+
+    fn get_title(&self) -> &str {
+        self.title
     }
 }
 

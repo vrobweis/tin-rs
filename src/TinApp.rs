@@ -27,46 +27,29 @@ use super::Tin::{
 
 use std::collections::VecDeque as Queue;
 
-type BGColor = [f32; 4];
-
 pub struct App {
-    Background_Color: BGColor,
-    title: &'static str,
     controller: Box<dyn TController>
 }
 
 impl Default for App {
     fn default() -> Self {
-        let mut app = App::new("Title", [0.5, 0.5, 0.5, 1.0]);
+        let app = App::new();
         println!("Shape pushed");
         return app;
     }
 }
 
 impl App {
-    pub fn new(title: &'static str, bg_color: BGColor) -> App {
+    pub fn new() -> App {
         let shapes = Queue::<Shape>::new();
         App {
-            Background_Color: bg_color,
-            title: title,
             controller: Box::new(TinController::default())
         }
     }
 
-    pub fn new_with_controller(title: &'static str, controller: Box<dyn TController>) -> App {
+    pub fn new_with_controller(controller: Box<dyn TController>) -> App {
         let shapes = Queue::<Shape>::new();
         App {
-            Background_Color: [0.9,0.9,0.9,1.0],
-            title: title,
-            controller: controller
-        }
-    }
-
-    pub fn new_with_controllerAndColor(title: &'static str, bg_color: BGColor, controller: Box<dyn TController>) -> App {
-        let shapes = Queue::<Shape>::new();
-        App {
-            Background_Color: bg_color,
-            title: title,
             controller: controller
         }
     }
@@ -85,6 +68,7 @@ impl App {
                 1 => panic!("Shape had one vertex"),
                 2 => panic!("Shape had two vertices"), // drawMode = Mode::Line,
                 3 => drawMode = Mode::Triangle,
+                5 => drawMode = Mode::TriangleStrip,
                 _ => drawMode = Mode::Patch(vertexCount),
             }
             let vertvec = shape.getVertices();
@@ -103,20 +87,12 @@ impl App {
     
 
     pub fn run(&mut self) -> Result<(), ()> {
+        eprintln!("TinApp::run()");
         // Application logic here
         let start_time = Instant::now();
 
-        let view_frame = self.controller.get_view().get_dimensions();
 
-        let mut surface = GlfwSurface::new_gl33(
-            self.title,
-            WindowOpt::default()
-                .set_dim(WindowDim::Windowed {
-                    width: view_frame.get_width(),
-                    height: view_frame.get_height(),
-                })
-                .set_cursor_mode(luminance_windowing::CursorMode::Visible)).unwrap();
-
+        let mut surface = produce_graphics_surface(&self.controller);
 
         let ctxt = &mut surface.context;
         let events = &surface.events_rx;
@@ -136,7 +112,10 @@ impl App {
 
         'apploop: loop {
 
-            self.controller.get_view().draw();
+            {
+                self.controller.get_view_mut().draw();
+            }
+            
 
             // handle events
             ctxt.window.glfw.poll_events(); // Fill receiver with events
@@ -146,8 +125,8 @@ impl App {
                     WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) => {
                         break 'apploop
                     }
-                    WindowEvent::Char(c) => {self.controller.keyDown(c)},
-                    WindowEvent::CharModifiers(c, m) => {todo!()},
+                    WindowEvent::Char(c) => { self.controller.keyDown(c) },
+                    WindowEvent::CharModifiers(c, m) => { todo!() },
                     WindowEvent::FramebufferSize(..) => back_buffer = ctxt.back_buffer().unwrap(),
                     WindowEvent::Key(k, _, _, _) => {},
                     WindowEvent::Pos(_, _) => {}
@@ -170,30 +149,18 @@ impl App {
 
             // rendering code goes here
 
-            /*
-            {
-                let elapsed_time = start_time.elapsed().as_millis();
-
-                let reduced_elapsed_time = elapsed_time as f32 * 1e-3;
-                let color: BGColor = [
-                    reduced_elapsed_time.cos(),
-                    reduced_elapsed_time.sin(),
-                    0.5,
-                    1.0,
-                ];
-                println!("Background color: {:?}", color)
-            }
-            */
-
             let bg_color;
-            let bg_render_color;
             {
-                bg_render_color = get_tin().render.get_background_color();
+                let bg_render_color;
+                {
+                    bg_render_color = get_tin().render.get_background_color();
+                }
+                {
+                    bg_color = [bg_render_color.red as Float, bg_render_color.green as Float, 
+                    bg_render_color.blue as Float, bg_render_color.alpha as Float]
+                }
             }
-            {
-                bg_color = [bg_render_color.red as Float, bg_render_color.green as Float, 
-                bg_render_color.blue as Float, bg_render_color.alpha as Float]
-            }
+            
 
             let render: Render<PipelineError> = ctxt
                 .new_pipeline_gate()
@@ -221,7 +188,7 @@ impl App {
             // swap buffer chains and draw the back buffer to the front buffer, thus displaying to user
 
             if render.is_ok() {
-                App::pace_frames(self.controller.get_view().get_fps(), last_frame_time);
+                pace_frames(self.controller.get_view().get_fps(), last_frame_time);
                 ctxt.window.swap_buffers();
                 last_frame_time = Instant::now();
             } else {
@@ -235,23 +202,39 @@ impl App {
         Ok(())
     }
 
-    fn pace_frames(target_fps: u16, last_frame_time: Instant) {
-        
-        let mut target_FPS_local: u32 = target_fps as u32;
-        
-        if target_FPS_local == 0 {target_FPS_local = 1};
-        let frametime_ms: u32 = 1000 / target_FPS_local;
-        let safe_sleep_period: Duration =
-            Duration::from_millis((frametime_ms as f32 * (9f32 / 10f32)) as u64);
-        if Instant::now().duration_since(last_frame_time).as_millis()
-            < safe_sleep_period.as_millis()
-        {
-            //println!("Met threshold for sleep, duration is {}",safe_sleep_period.as_millis().to_string() );
-            std::thread::sleep(safe_sleep_period);
-        }
+    
+}
 
-        while (Instant::now().duration_since(last_frame_time).as_millis() as u32) < frametime_ms {
-            //println!("Spinlocking, duration is {}",Instant::now().duration_since(last_frame_time).as_millis().to_string() );
-        }
+fn produce_graphics_surface(controller: &Box<dyn TController>) -> GlfwSurface {
+    let view_frame = controller.get_view().get_dimensions();
+
+    let view_title = controller.get_view().get_title();
+
+    let win_opt = WindowOpt::default()
+        .set_dim(WindowDim::Windowed {
+            width: view_frame.get_width(),
+            height: view_frame.get_height(),
+        })
+        .set_cursor_mode(luminance_windowing::CursorMode::Visible);
+
+    GlfwSurface::new_gl33(view_title, win_opt).expect("GlfwSurface could not be built")
+}
+
+fn pace_frames(target_fps: u16, last_frame_time: Instant) {
+    let mut target_FPS_local: u32 = target_fps as u32;
+    
+    if target_FPS_local == 0 {target_FPS_local = 1};
+    let frametime_ms: u32 = 1000 / target_FPS_local;
+    let safe_sleep_period: Duration =
+        Duration::from_millis((frametime_ms as f32 * (9f32 / 10f32)) as u64);
+    if Instant::now().duration_since(last_frame_time).as_millis()
+        < safe_sleep_period.as_millis()
+    {
+        //println!("Met threshold for sleep, duration is {}",safe_sleep_period.as_millis().to_string() );
+        std::thread::sleep(safe_sleep_period);
+    }
+
+    while (Instant::now().duration_since(last_frame_time).as_millis() as u32) < frametime_ms {
+        //println!("Spinlocking, duration is {}",Instant::now().duration_since(last_frame_time).as_millis().to_string() );
     }
 }

@@ -45,7 +45,7 @@ impl TPixel {
     }
 }
 
-#[derive(Copy)]
+#[derive(Clone, Copy)]
 pub struct TinColor {
     pub red: Double,
     pub green: Double,
@@ -53,16 +53,7 @@ pub struct TinColor {
     pub alpha: Double
 }
 
-impl Clone for TinColor {
-    fn clone(&self) -> Self {
-        Self {
-            red: self.red,
-            green: self.green,
-            blue: self.blue,
-            alpha: self.alpha
-        }
-    }
-}
+
 
 pub const DEFAULT_COLOR_FILL: TinColor = TinColor {
     red: 0.7,

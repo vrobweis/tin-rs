@@ -1,13 +1,22 @@
 
 
 pub struct TinPoint {
-    pub x: f32,
-    pub y: f32
+    pub x: f64,
+    pub y: f64
 }
 
 impl TinPoint {
-    pub fn new_from_coords(x: f32, y: f32) -> Self {
+    pub fn new_from_coords(x: f64, y: f64) -> Self {
         Self { x: x, y: y }
+    }
+}
+
+impl Clone for TinPoint {
+    fn clone(&self) -> Self {
+        Self {
+            x: self.x,
+            y: self.y
+        }
     }
 }
 

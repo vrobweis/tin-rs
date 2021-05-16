@@ -53,8 +53,6 @@ impl TinImage {
                 }
             }
         )
-
-        
     }
     
     

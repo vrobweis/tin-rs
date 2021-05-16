@@ -16,7 +16,7 @@ pub struct TinController {
 impl Default for TinController {
     fn default() -> Self {
         Self {
-            tin_view: Box::new(TinView::new_from_dimensions(500, 500))
+            tin_view: Box::new(TinView::new_from_dimensions("Default Title", 500, 500))
         }
     }
 }
@@ -30,7 +30,11 @@ impl TinController {
 }
 
 impl TController for TinController {
-    fn get_view(&mut self) -> &mut Box<dyn TView> {
+    fn get_view(&self) -> & Box<dyn TView> {
+        &self.tin_view
+    }
+
+    fn get_view_mut(&mut self) -> &mut Box<dyn TView> {
         &mut self.tin_view
     }
 
@@ -65,7 +69,8 @@ impl TController for TinController {
 
 pub trait TController {
 
-    fn get_view(&mut self) -> &mut Box<dyn TView>;
+    fn get_view(&self) -> &Box<dyn TView>;
+    fn get_view_mut(&mut self) -> &mut Box<dyn TView>;
 
     fn viewWillAppear(&mut self);
     fn viewDidAppear(&mut self);

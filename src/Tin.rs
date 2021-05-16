@@ -47,6 +47,8 @@ use TFrame::TinFrame;
 use TPoint::TinPoint;
 use luminance_glfw::GlfwSurface;
 use luminance_windowing::{WindowDim, WindowOpt};
+
+use self::TColor::DEFAULT_COLOR_BACKGROUND;
 // TinImage::TinImage };
 
 
@@ -58,11 +60,12 @@ lazy_static! {
 
 
 
-pub fn get_tin<'t>() -> MutexGuard<'t, TinContext> { TIN_MUTEX.lock().unwrap() }
-
-pub enum DrawType {
-    Fill, Stroke, FillAndStroke
+pub fn get_tin<'t>() -> MutexGuard<'t, TinContext> {
+    eprintln!("get_tin()");
+    TIN_MUTEX.lock().unwrap()
 }
+
+
 pub trait TinRenderer {
     
     //let useLayer: bool { get set }
@@ -86,7 +89,7 @@ pub trait TinRenderer {
     fn ellipse(&mut self, x: &Float, y: &Float, w: &Float, h: &Float);
     fn ellipse_in_TRect(&mut self, in_rect: &TinRect);
 
-    fn rect(&mut self, withRect: &TinRect);
+    fn rect(&mut self, x: &Double, y: &Double, w: &Double, h: &Double);
     fn rect_with_TRect(&mut self, withRect: &TinRect);
     
     fn line(&mut self, x1: &Double, y1: &Double, x2: &Double, y2: &Double);
@@ -143,8 +146,10 @@ pub struct TinContext {
     pub pmouseY: Double,
     pub mousePressed: bool,
     pub frameCount: u16,
-    
-    drawType: DrawType,
+
+    current_fill_color: TinColor,
+    current_stroke_color: TinColor,
+    current_background_color: TinColor,
 
     pathVertexCount: u16,
     
@@ -170,14 +175,17 @@ impl TinContext {
             mousePressed: false,
             frameCount: 0,
             
-            drawType: DrawType::Fill,
+
+            current_fill_color: DEFAULT_COLOR_FILL,
+            current_stroke_color: DEFAULT_COLOR_STROKE,
+            current_background_color: DEFAULT_COLOR_BACKGROUND,
 
             pathVertexCount: 0,
             
             render: renderer
         }
     }
-    
+
     /// TODO: Document this method.
     pub fn prepare(&mut self, frame: TinFrame) {
         // self.render.delegate = self;
@@ -219,8 +227,7 @@ impl TinContext {
         self.resetSize(width, height);
         self.fill = true;
         self.stroke = true;
-        lineWidth(&2.0);
-        self.drawType = DrawType::FillAndStroke;
+        lineWidth(&0.05);
         
         fillColor_from_color(&DEFAULT_COLOR_FILL);
         strokeColor_from_color(&DEFAULT_COLOR_STROKE);
@@ -298,7 +305,7 @@ pub fn arc(x: &Double, y: &Double, radius: &Double, startAngle: &Double, endAngl
 pub fn ellipse(centerX: &Double, centerY: &Double, width: &Double, height: &Double) {
     let x = centerX - width / 2.0;
     let y = centerY - height / 2.0;
-    let r = TinRect::new_from_dimensions( x as Float, y as Float, *width as Float, *height as Float);
+    let r = TinRect::new_from_dimensions( x, y, *width, *height);
     let mut tin = get_tin();
     tin.render.ellipse_in_TRect( &r);
 }
@@ -324,14 +331,16 @@ pub fn lineWidth(width: &Double) {
 #[allow(dead_code)]
 /// Draw a rectangle. Input is left, bottom coordinate and width, height size.
 pub fn rect(x: &Double, y: &Double, width: &Double, height: &Double) {
-    let r = TinRect::new_from_dimensions( *x as Float, *y as Float, *width as Float, *height as Float);
+    eprintln!("Tin::rect()");
+    let r = TinRect::new_from_dimensions( *x, *y, *width, *height);
     let mut tin = get_tin();
-    tin.render.rect(&r);
+    tin.render.rect_with_TRect(&r);
 }
 
 #[allow(dead_code)]
 /// TODO: Document this function.
 pub fn triangle(x1: Double, y1: Double, x2: Double, y2: Double, x3: Double, y3: Double) {
+    eprintln!("Tin::triangle()");
     let mut tin = get_tin();
     tin.render.triangle(&x1, &y1, &x2, &y2, &x3, &y3);
 }
@@ -350,7 +359,7 @@ pub fn pathBegin() {
 #[allow(dead_code)]
 /// Add a new point to the current path. (input 2 CGFloats)
 pub fn pathVertex(x: &Double, y: &Double) {
-    let point = TinPoint {x: *x as Float, y: *y as Float};
+    let point = TinPoint {x: *x, y: *y};
     let mut tin = get_tin();
     tin.render.pathVertex( &point);
     tin.pathVertexCount += 1;

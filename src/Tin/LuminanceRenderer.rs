@@ -23,7 +23,13 @@ use luminance::{
     tess::{Mode, Tess},
 };
 
-use super::{Double, DrawType, Float, TColor::{self, DEFAULT_COLOR_BACKGROUND, DEFAULT_COLOR_FILL, DEFAULT_COLOR_STROKE, TinColor}, TFont::TinFont, TFrame::TinFrame, TImage::TinImage, TPoint::TinPoint, TShapes::{TinRect, TinShape}, TVertex::TinVertex, TinContext, TinRenderer, get_tin};
+use crate::Tin::TVector2::TVector2;
+
+use super::{Double, Float, 
+    TColor::{self, DEFAULT_COLOR_BACKGROUND, DEFAULT_COLOR_FILL, DEFAULT_COLOR_STROKE, TinColor}, 
+    TFont::TinFont, TFrame::TinFrame, TImage::TinImage, TPoint::TinPoint, 
+    TShapes::{TinRect, TinShape}, TVertex::TinVertex, TinContext, TinRenderer, get_tin
+};
 
 use std::collections::VecDeque as Queue;
 
@@ -31,7 +37,7 @@ use std::collections::VecDeque as Queue;
 
 #[allow(dead_code)]
 fn MakeVertex(point: &TinPoint, color: &TinColor) -> TinVertex {
-    let position = super::TVertex::VertexPosition::new([point.x, point.y]);
+    let position = super::TVertex::VertexPosition::new([point.x as Float, point.y as Float]);
     TinVertex::new_from_pointAndColor(point, color)
     
 }
@@ -53,6 +59,7 @@ fn MakeShapeFromVec(vertices: Vec<TinVertex>) -> TinShape {
 }
 
 
+const DEFAULT_LINE_WIDTH: Double = 0.05;
 
 pub struct LuminanceRenderer {
     pub shape_queue: Queue<TinShape>,
@@ -60,7 +67,7 @@ pub struct LuminanceRenderer {
     save_state: bool,
     saved_shape_queue: Queue<TinShape>,
 
-    pub drawType: DrawType,
+    line_width: Double,
 
     // pub delegate: TinContext,
     current_fill_color: TinColor,
@@ -73,38 +80,24 @@ pub struct LuminanceRenderer {
 }
 
 impl LuminanceRenderer {
-    #[allow(dead_code)]
-    pub fn new() -> Self {
-        Self {
-            shape_queue: Queue::<TinShape>::new(),
 
-            save_state: false,
-            saved_shape_queue: Queue::<TinShape>::new(),
-            drawType: DrawType::Fill,
-            //delegate: delegate
-            current_fill_color: DEFAULT_COLOR_FILL,
-            current_stroke_color: DEFAULT_COLOR_STROKE,
-            current_background_color: DEFAULT_COLOR_BACKGROUND,
-            useLayer: false,
-
-            path_started: false,
-            path_vertices: Queue::<TinVertex>::new()
-        }
-    }
 
     fn EnqueueShape(&mut self, points: &Vec<TinPoint>) {
-        let draw_type = &self.drawType;
-        let fill_color = &self.get_fill_color();
-        let stroke_color = &self.get_stroke_color();
+        eprintln!("LuminanceRenderer::EnqueueShape()");
+
+        let fill_color = self.get_fill_color();
+        let stroke_color = self.get_stroke_color();
+
+        let use_fill: bool = fill_color.alpha > 0.0;
+        let use_stroke: bool = stroke_color.alpha > 0.0;
+        
         let shape_queue = &mut self.shape_queue;
         
-        match draw_type {
-            DrawType::Fill => shape_queue.push_back(MakeShapeFromPointVec(points, &fill_color)),
-            DrawType::Stroke => shape_queue.push_back(MakeShapeFromPointVec(points, &stroke_color)),
-            DrawType::FillAndStroke => { 
-                shape_queue.push_back(MakeShapeFromPointVec(points, &fill_color)); 
-                shape_queue.push_back(MakeShapeFromPointVec(points, &stroke_color)); 
-            }
+        if use_fill {
+            shape_queue.push_back(MakeShapeFromPointVec(points, &fill_color))
+        };
+        if use_stroke {
+            shape_queue.push_back(MakeShapeFromPointVec(points, &stroke_color))
         }
     }
 
@@ -119,7 +112,8 @@ impl TinRenderer for LuminanceRenderer {
     }
 
     fn prepareForUpdate(&mut self, frame: TinFrame) {
-        
+        eprintln!("LuminanceRenderer::prepareForUpdate()");
+
         self.shape_queue.clear();
         assert!(self.shape_queue.len() == 0);
 
@@ -127,8 +121,6 @@ impl TinRenderer for LuminanceRenderer {
 
         self.saved_shape_queue.clear();
         assert!(self.saved_shape_queue.len() == 0);
-
-        self.drawType = DrawType::FillAndStroke;
 
         self.current_fill_color = TColor::DEFAULT_COLOR_FILL;
         self.current_stroke_color = TColor::DEFAULT_COLOR_STROKE;
@@ -155,52 +147,99 @@ impl TinRenderer for LuminanceRenderer {
     
     // Set background
     fn background(&mut self, red: &Double, green: &Double, blue: &Double) {
+        eprintln!("LuminanceRenderer::background()");
         self.current_background_color = TinColor::new_from_rgba(*red, *green, *blue, 1.0)
     }
 
     fn arc(&mut self, x: &Double, y: &Double, radius: &Double, startAngle: &Double, endAngle: &Double) {
+        eprintln!("LuminanceRenderer::arc()");
         todo!("Arc render for LuminanceRenderer not implemented");
     }
     
     fn ellipse(&mut self, x: &Float, y: &Float, w: &Float, h: &Float) {
+        eprintln!("LuminanceRenderer::ellipse()");
         todo!("Ellipse render for LuminanceRenderer not implemented");
     }
     
     fn ellipse_in_TRect(&mut self, in_rect: &TinRect) {
+        eprintln!("LuminanceRenderer::ellipse_in_TRect()");
         todo!("Ellipse render inside TinRect for LuminanceRenderer not implemented");
     }
 
-    fn rect(&mut self, withRect: &TinRect) {
-        todo!("rect method in LuminanceRenderer not supported yet");
+    fn rect(&mut self, x: &Double, y: &Double, w: &Double, h: &Double) {    
+        eprintln!("LuminanceRenderer::rect()");
+        self.rect_with_TRect(&TinRect::new_from_dimensions(*x, *y, *w, *h));
     }
 
     fn rect_with_TRect(&mut self, withRect: &TinRect) {
-        todo!("Rect render with TinRect for LuminanceRenderer not implemented");
-        //if self.delegate.fill {
-            //cg.fill(rect)
-        //}
-        //if self.delegate.stroke {
-            //cg.stroke(rect)
-        //}
+        eprintln!("LuminanceRenderer::rect_with_TRect()");
+        let bottomLeft = TinPoint::new_from_coords(withRect.x, withRect.y);
+
+
+
+        let width = withRect.get_width();
+        let height = withRect.get_height();
+
+        let point1 = TinPoint::new_from_coords(bottomLeft.x, bottomLeft.y);
+        let point2 = TinPoint::new_from_coords(bottomLeft.x, bottomLeft.y + height);
+        let point3 = TinPoint::new_from_coords(bottomLeft.x + width, bottomLeft.y + height);
+        let point4 = TinPoint::new_from_coords(bottomLeft.x + width, bottomLeft.y);
+
+
+        self.EnqueueShape(&Vec::from([point1.clone(),point2,point3,point4,point1]));
     }
 
 
     // Draw line with previously set line width
     fn line(&mut self, x1: &Double, y1: &Double, x2: &Double, y2: &Double) {
-        todo!("Line render for LuminanceRenderer not implemented");
+        eprintln!("LuminanceRenderer::line()");
+        let relative_width = self.line_width/2.0;
+        let first_vector = TVector2::new_from_xy(*x1, *y1);
+        let second_vector = TVector2::new_from_xy(*x2, *y2);
+
+        let lineVector = second_vector - first_vector;
+
+        let mut perpendicularClockwiseVec;
+        let mut perpendicularCounterClockwiseVec;
+        {
+            perpendicularClockwiseVec = lineVector.perpendicular_clockwise();
+            perpendicularCounterClockwiseVec = lineVector.perpendicular_counterclockwise();
+            
+            perpendicularClockwiseVec.set_magnitude(relative_width);
+            perpendicularCounterClockwiseVec.set_magnitude(relative_width);
+        }
+        
+
+        let points;
+        {
+            let sideOnePointOne = first_vector + perpendicularCounterClockwiseVec;
+            let sideOnePointTwo = first_vector + perpendicularClockwiseVec;
+            
+            let sideTwoPointOne = second_vector + perpendicularCounterClockwiseVec;
+            let sideTwoPointTwo = second_vector + perpendicularClockwiseVec;
+
+            let point1 = TinPoint::new_from_coords(sideOnePointOne.x, sideOnePointOne.y);
+            let point2 = TinPoint::new_from_coords(sideOnePointTwo.x, sideOnePointTwo.y);
+            let point3 = TinPoint::new_from_coords(sideTwoPointOne.x, sideTwoPointOne.y);
+            let point4 = TinPoint::new_from_coords(sideTwoPointTwo.x, sideTwoPointTwo.y);
+
+            points = Vec::from([point1.clone(),point2,point3,point4, point1]);
+        }
+
+        self.EnqueueShape(&points);
     }
     
     
     // Set line width
     fn lineWidth(&mut self, width: &Double) {
-        todo!();
+        self.line_width = *width;
         //cg.setLineWidth(CGFloat(width));
     }
     
     fn triangle(&mut self, x1: &Double, y1: &Double, x2: &Double, y2: &Double, x3: &Double, y3: &Double) {
-        let point1 = TinPoint::new_from_coords(*x1 as Float, *y1 as Float);
-        let point2 = TinPoint::new_from_coords(*x2 as Float, *y2 as Float);
-        let point3 = TinPoint::new_from_coords(*x3 as Float, *y3 as Float);
+        let point1 = TinPoint::new_from_coords(*x1, *y1);
+        let point2 = TinPoint::new_from_coords(*x2, *y2);
+        let point3 = TinPoint::new_from_coords(*x3, *y3);
         self.EnqueueShape(&Vec::from([point1, point2, point3]));
     }
     
@@ -257,6 +296,7 @@ impl TinRenderer for LuminanceRenderer {
     // MARK: - Color state
     
     fn set_stroke_color(&mut self, red: &Double, green: &Double, blue: &Double, alpha: &Double) {
+        eprintln!("LuminanceRenderer::set_stroke_color()");
         //cg.setStrokeColor(red: r, green: g, blue: b, alpha: a);
         self.current_stroke_color = TinColor::new_from_rgba(*red, *green, *blue, *alpha);
     }
@@ -266,21 +306,29 @@ impl TinRenderer for LuminanceRenderer {
     
     
     fn set_fill_color(&mut self, red: &Double, green: &Double, blue: &Double, alpha: &Double) {
+        eprintln!("LuminanceRenderer::set_fill_color()");
         //cg.setFillColor(red: r, green: g, blue: b, alpha: a);
         self.current_fill_color = TinColor::new_from_rgba(*red, *green, *blue, *alpha);
     }
     
     
     fn get_stroke_color(&self) -> TinColor {
-        return self.current_stroke_color.clone()
+        eprintln!("LuminanceRenderer::get_stroke_color()");
+        return self.current_stroke_color
     }
     
     
     fn get_fill_color(&self) -> TinColor {
-        return self.current_fill_color.clone()
+        eprintln!("LuminanceRenderer::get_fill_color()");
+        return self.current_fill_color
+    }
+
+    fn get_background_color(&self) -> TinColor {
+        return self.current_background_color
     }
     
     fn set_alpha(&mut self, alpha: &Double) {
+        eprintln!("LuminanceRenderer::set_alpha()");
         {
             let current_color = self.current_fill_color;
             let red = current_color.red;
@@ -303,16 +351,19 @@ impl TinRenderer for LuminanceRenderer {
     // MARK: - Context state
     
     fn pushState(&mut self) {
+        eprintln!("LuminanceRenderer::pushState()");
         self.save_state = true;
     }
     
     fn popState(&mut self) {
+        eprintln!("LuminanceRenderer::popState()");
         self.save_state = false;
     }
     
     // MARK: - Transformations
     
     fn translate(&mut self, dx: &Double, dy: &Double) {
+        eprintln!("LuminanceRenderer::translate()");
         todo!("Translate not supported")
         // Set an offset value that affects all vertices drawn in current state so far
     }
@@ -354,9 +405,7 @@ impl TinRenderer for LuminanceRenderer {
         // Draw text at location with default size
     }
 
-    fn get_background_color(&self) -> TinColor {
-        self.current_background_color
-    }
+    
 }
 
 
@@ -367,7 +416,9 @@ impl Default for LuminanceRenderer {
 
             save_state: false,
             saved_shape_queue: Queue::<TinShape>::new(),
-            drawType: DrawType::Fill,
+
+            line_width: DEFAULT_LINE_WIDTH as Double,
+
             //delegate: TinContext::init(),// Probably need to change this when the context is fully implemented
             current_fill_color: DEFAULT_COLOR_FILL,
             current_stroke_color: DEFAULT_COLOR_STROKE,
