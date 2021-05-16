@@ -1,0 +1,23 @@
+[package]
+name = "tin-rs"
+version = "0.1.0"
+authors = ["Vincent Robert Weis <vrobweis@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+luminance = "0.43.2"
+luminance-front = "0.3.1"
+luminance-glfw = "0.15"
+luminance-gl = "0.16.1"
+luminance-glutin = "0.11.3"
+luminance-windowing = "0.9"
+luminance-derive = "0.6"
+glfw = "0.41"
+glutin = "0.26"
+image = "0.23.14"
+chrono = "0.4"
+font-kit = "0.10.0"
+rand = "0.8.3"
+lazy_static = "1.4.0"
