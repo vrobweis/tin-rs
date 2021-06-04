@@ -3,7 +3,7 @@ pub(crate) mod luminance;
 
 use std::time::{Instant, Duration};
 
-use crate::{context::{DrawState, DrawType}, event::TinEvent, scene::TScene, view::TinView};
+use crate::{context::{DrawState, TBrush}, event::TinEvent, scene::TScene, view::TinView};
 
 use super::{Double, controller::TinController, font::TinFont, frame::TinFrame, image::TinImage, point::TinPoint, shapes::TinRect};
 
@@ -47,25 +47,25 @@ pub(crate) trait TinRenderer: /*BackgroundRenderer +*/ RectRenderer + TriangleRe
 }
 
 pub(crate) trait RectRenderer {
-    fn rect(&mut self, x: &Double, y: &Double, w: &Double, h: &Double, brush: DrawType, state: DrawState);
-    fn rect_with_tinrect(&mut self, with_rect: &TinRect, brush: DrawType, state: DrawState);
-    fn rounded_rect(&mut self, rect: &TinRect, radius_x: &Double, radius_y: &Double, brush: DrawType, state: DrawState);
+    fn rect(&mut self, x: &Double, y: &Double, w: &Double, h: &Double, brush: TBrush, state: DrawState);
+    fn rect_with_tinrect(&mut self, with_rect: &TinRect, brush: TBrush, state: DrawState);
+    fn rounded_rect(&mut self, rect: &TinRect, radius_x: &Double, radius_y: &Double, brush: TBrush, state: DrawState);
 }
 
 pub(crate) trait TriangleRenderer {
-    fn triangle(&mut self, x1: &Double, y1: &Double, x2: &Double, y2: &Double, x3: &Double, y3: &Double, brush: DrawType, state: DrawState);
+    fn triangle(&mut self, x1: &Double, y1: &Double, x2: &Double, y2: &Double, x3: &Double, y3: &Double, brush: TBrush, state: DrawState);
 }
 pub(crate) trait LineRenderer {
-    fn line(&mut self, x1: &Double, y1: &Double, x2: &Double, y2: &Double, width: &Double, brush: DrawType, state: DrawState);
+    fn line(&mut self, x1: &Double, y1: &Double, x2: &Double, y2: &Double, width: &Double, brush: TBrush, state: DrawState);
 }
 
 pub(crate) trait ArcRenderer {
-    fn arc(&mut self, x: &Double, y: &Double, radius: &Double, start_angle: &Double, end_angle: &Double, brush: DrawType, state: DrawState);
+    fn arc(&mut self, x: &Double, y: &Double, radius: &Double, start_angle: &Double, end_angle: &Double, brush: TBrush, state: DrawState);
 }
 
 pub(crate) trait EllipseRenderer {
-    fn ellipse(&mut self, x: &Double, y: &Double, w: &Double, h: &Double, brush: DrawType, state: DrawState);
-    fn ellipse_in_tinrect(&mut self, in_rect: &TinRect, brush: DrawType, state: DrawState);
+    fn ellipse(&mut self, x: &Double, y: &Double, w: &Double, h: &Double, brush: TBrush, state: DrawState);
+    fn ellipse_in_tinrect(&mut self, in_rect: &TinRect, brush: TBrush, state: DrawState);
 }
 
 pub(crate) trait PathRenderer {

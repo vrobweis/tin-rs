@@ -49,7 +49,7 @@ pub fn run<S,H>(tin_view: TinView, scene: S, handler: H) -> Result<(), ()> where
     BACKEND::run(TinController::new(tin_view, scene, handler))
 }
 
-pub(crate) enum DrawType {
+pub(crate) enum TBrush {
     Fill(TinColor), Stroke(TinColor), FillAndStroke(TinColor, TinColor), Disabled
 }
 
@@ -119,15 +119,15 @@ impl<T: TBackend> TinContext<T> {
         }
     }
 
-    pub fn get_brush(&self) -> DrawType {
+    pub fn get_brush(&self) -> TBrush {
         if self.fill & self.stroke {
-            DrawType::FillAndStroke(self.current_fill_color, self.current_stroke_color)
+            TBrush::FillAndStroke(self.current_fill_color, self.current_stroke_color)
         } else if self.fill & !self.stroke {
-            DrawType::Fill(self.current_fill_color)
+            TBrush::Fill(self.current_fill_color)
         } else if !self.fill & self.stroke {
-            DrawType::Stroke(self.current_stroke_color)
+            TBrush::Stroke(self.current_stroke_color)
         } else {
-            DrawType::Disabled
+            TBrush::Disabled
         }
     }
 

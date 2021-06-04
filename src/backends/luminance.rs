@@ -83,7 +83,7 @@ pub struct LuminanceBackend {
 
 impl LuminanceBackend {
     
-    fn enqueue_shape(&mut self, mut points: Vec<TVector2>, brush: DrawType, state: DrawState) {
+    fn enqueue_shape(&mut self, mut points: Vec<TVector2>, brush: TBrush, state: DrawState) {
         eprintln!("LuminanceBackend::enqueue_shape()");
 
         for p in &mut points {
@@ -93,15 +93,15 @@ impl LuminanceBackend {
         let shape_queue = &mut self.shape_queue;
 
         match brush {
-            DrawType::Fill(c) => {
+            TBrush::Fill(c) => {
                 shape_queue.push_back(make_shape_from_vector_vec(points, &c))
             },
-            DrawType::Stroke(c) => shape_queue.push_back(make_shape_from_vector_vec(points, &c)),
-            DrawType::FillAndStroke(f, s) => {
+            TBrush::Stroke(c) => shape_queue.push_back(make_shape_from_vector_vec(points, &c)),
+            TBrush::FillAndStroke(f, s) => {
                 shape_queue.push_back(make_shape_from_vector_vec(points.clone(), &f));
                 shape_queue.push_back(make_shape_from_vector_vec(points, &s))
             },
-            DrawType::Disabled => todo!(),
+            TBrush::Disabled => todo!(),
         }
     }
 
@@ -390,7 +390,7 @@ fn prepare_shapes_for_render(context: &mut GL33Context) -> Queue<Tess<GL33, TinV
 }
 
 use glfw::Key;
-use crate::{context::{DrawState, DrawType}, key::TinKey, view::TinView};
+use crate::{context::{DrawState, TBrush}, key::TinKey, view::TinView};
 
 fn map_key_to_tin_key(k: glfw::Key) -> Option<TinKey> {
 
