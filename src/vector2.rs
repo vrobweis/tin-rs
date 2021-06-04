@@ -1,14 +1,3 @@
-//
-//  TVector2.swift
-//  Tin
-//
-//  Created by Loren Olson on 10/3/16.
-//  Created at the School of Arts, Media and Engineering,
-//  Herberger Institute for Design and the Arts,
-//  Arizona State University.
-//  Copyright (c) 2017 Arizona Board of Regents on behalf of Arizona State University
-//
-
 use super::{Double, calculation::sqrt};
 
 
@@ -49,12 +38,9 @@ impl TVector2 {
     }
 
     pub fn set_magnitude(&mut self, new_value: Double) {
-        
-        println!("magnitizing with {}: {},{}", new_value, self.x, self.y);
         self.normalize();
         self.x = self.x * new_value;
         self.y = self.y * new_value;
-        println!("magnitized: {},{}", self.x, self.y);
     }
     
     

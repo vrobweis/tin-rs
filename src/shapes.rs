@@ -48,33 +48,50 @@ impl Default for TinShape {
 }
 
 
+use crate::Double;
+use crate::color::TColor;
+use crate::vector2::TVector2;
+
+pub(crate) fn make_shape_from_vertex_vec(vertices: Vec<TinVertex>) -> TinShape {
+    TinShape::new(vertices)
+}
+
+pub(crate) fn make_shape_from_vector_vec(points: Vec<TVector2>, color: &impl TColor) -> TinShape {
+    let mut vertices = Vec::new();
+    for point in points {
+        let vertex = TinVertex::new_from_vector_and_color(&point, color);
+        vertices.push(vertex);
+    }
+    return make_shape_from_vertex_vec(vertices);
+}
+
 #[derive(Debug, Clone)]
 pub struct TinRect {
-    pub x: f64,
-    pub y: f64,
-    width: f64,
-    height: f64
+    pub x: Double,
+    pub y: Double,
+    width: Double,
+    height: Double
 }
 
 
 impl TinRect {
-    pub fn new_from_dimensions(x: f64, y: f64, w: f64, h: f64) -> Self {
+    pub fn new_from_dimensions(x: Double, y: Double, w: Double, h: Double) -> Self {
         Self {
             x: x, y: y, width: w.abs(), height: h.abs()
         }
     }
 
-    pub fn get_width(&self) -> f64 {
+    pub fn get_width(&self) -> Double {
         self.width
     }
-    pub fn set_width(&mut self, width: f64){
+    pub fn set_width(&mut self, width: Double){
         self.width = width.abs()
     }
 
-    pub fn get_height(&self) -> f64 {
+    pub fn get_height(&self) -> Double {
         self.height
     }
-    pub fn set_height(&mut self, height: f64) {
+    pub fn set_height(&mut self, height: Double) {
         self.height = height.abs()
     }
 

@@ -1,22 +1,15 @@
-use crate::context::get_tin_mut;
+
+
+use crate::UInt;
 
 use super::{
-    view::{
-        TinView
-    },
+    context::get_tin_mut,
+    view::TinView,
     event::TinEvent,
     scene::TScene
 };
 
-//
-//  TController.swift
-//  Tin
-//
-//  Created by Loren Olson on 5/15/17.
-//  Copyright © 2017 ASU. All rights reserved.
-//
-
-pub struct TinController<S, H> where S: TScene, H: Fn(TinEvent, &mut S, &mut TinView) {
+pub(crate) struct TinController<S, H> where S: TScene, H: Fn(TinEvent, &mut S, &mut TinView) {
     pub(crate) tin_view: TinView,
     pub(crate) scene: S,
     pub(crate) handler: H
@@ -27,7 +20,7 @@ impl<S, H> TinController<S, H> where S: TScene, H: Fn(TinEvent, &mut S, &mut Tin
     pub fn new(tin_view: TinView, mut scene: S, handler: H) -> Self {
         scene.setup();
         let controller = Self {
-            tin_view, scene: scene, handler: handler
+            tin_view, scene, handler
         };
         {
             let frame = controller.get_view().get_frame().clone();
@@ -44,8 +37,8 @@ impl<S, H> TinController<S, H> where S: TScene, H: Fn(TinEvent, &mut S, &mut Tin
         & mut self.tin_view
     }
 
-    /// create a TView object and assign to the view property
-    pub fn make_view(&mut self, title: &'static str, width: u32, height: u32) {
+    /// Create a TinView and assign to the controllers view field.
+    pub fn make_view(&mut self, title: &'static str, width: UInt, height: UInt) {
         self.tin_view = TinView::new_from_dimensions(title, width, height);
     }
     
@@ -57,7 +50,6 @@ impl<S, H> TinController<S, H> where S: TScene, H: Fn(TinEvent, &mut S, &mut Tin
     }
 
     pub fn draw(scene: &mut S) {
-        println!("TinController::draw()");
         {
             //let mut tin = get_tin_mut();
             get_tin_mut().update_frame_count();
@@ -71,9 +63,5 @@ impl<S, H> TinController<S, H> where S: TScene, H: Fn(TinEvent, &mut S, &mut Tin
         }
         
     }
-    
 
-    pub fn on_event(event: TinEvent, scene: &mut S, view: &mut TinView, handler: &mut H) {
-        handler(event, scene, view);
-    }
 }

@@ -1,14 +1,3 @@
-//
-//  CoreGraphicsRenderer.swift
-//  Tin
-//
-//  Created by Loren Olson on 1/4/17.
-//  Created at the School of Arts, Media and Engineering,
-//  Herberger Institute for Design and the Arts,
-//  Arizona State University.
-//  Copyright (c) 2017 Arizona Board of Regents on behalf of Arizona State University
-//
-
 pub(crate) mod arc;
 pub(crate) mod ellipse;
 pub(crate) mod image;
@@ -19,61 +8,40 @@ pub(crate) mod state;
 pub(crate) mod text;
 pub(crate) mod triangle;
 
-use luminance_gl::gl33::GL33;
 
+use luminance_gl::gl33::GL33;
 use glfw::{Action, Context, WindowEvent};
 use luminance::{
-    context::GraphicsContext as _,
+    context::GraphicsContext,
     pipeline::{PipelineError, PipelineState, Render},
     render_state::RenderState,
     tess::{Mode, Tess},
 };
 use luminance_glfw::{GL33Context, GlfwSurface};
 use luminance_windowing::{WindowDim, WindowOpt};
+use std::{collections::VecDeque as Queue, time::Instant};
 
-use super::{
-    super::{Float, 
-        color::{TColor}, 
-        controller::TinController, vertex::TinVertexSemantics,
-        context::{
-            get_tin
-        },
-        point::TinPoint, 
-        shapes::{TinShape}, vector2::TVector2, vertex::TinVertex,
-        context::get_tin_mut, event::TinEvent, scene::TScene
-    },
-    TinRenderer, TBackend
+
+use crate::{
+    Float, 
+    color::TColor, 
+    controller::TinController, 
+    vertex::TinVertexSemantics,
+    context::{get_tin, get_tin_mut},
+    point::TinPoint, 
+    shapes::*, 
+    vector2::TVector2, 
+    vertex::*,
+    event::TinEvent, 
+    scene::TScene,
+    backends::{TinRenderer, TBackend},
 };
 
-use std::{collections::VecDeque as Queue, time::{Instant}};
-
-
-
-
-fn make_vertex(point: &TinPoint, color: &impl TColor) -> TinVertex {
-    TinVertex::new_from_point_and_color(point, color)
-}
-
-fn make_shape_from_vertex_vec(vertices: Vec<TinVertex>) -> TinShape {
-    TinShape::new(vertices)
-}
-
-fn make_shape_from_vector_vec(points: Vec<TVector2>, color: &impl TColor) -> TinShape {
-    let mut vertices = Vec::<TinVertex>::new();
-    for point in points {
-        let vertex = TinVertex::new_from_vector_and_color(&point, color);
-        vertices.push(vertex);
-    }
-    return make_shape_from_vertex_vec(vertices);
-}
-
-pub struct LuminanceBackend {
+pub(crate) struct LuminanceBackend {
     pub shape_queue: Queue<TinShape>,
 
     save_state: bool,
     saved_shape_queue: Queue<TinShape>,
-
-    // pub delegate: TinContext,
     
     pub use_layer: bool,
 
@@ -84,14 +52,11 @@ pub struct LuminanceBackend {
 impl LuminanceBackend {
     
     fn enqueue_shape(&mut self, mut points: Vec<TVector2>, brush: TBrush, state: DrawState) {
-        eprintln!("LuminanceBackend::enqueue_shape()");
-
         for p in &mut points {
             p.rotate(state.rotation)
         }
         
         let shape_queue = &mut self.shape_queue;
-
         match brush {
             TBrush::Fill(c) => {
                 shape_queue.push_back(make_shape_from_vector_vec(points, &c))
@@ -194,7 +159,7 @@ impl TBackend for LuminanceBackend {
     
         let mut last_frame_time = Instant::now();
 
-        let mut mouse_pos: TinPoint = TinPoint::default();
+        let mut mouse_pos = TinPoint::default();
 
         
 
@@ -222,51 +187,51 @@ impl TBackend for LuminanceBackend {
                     WindowEvent::FramebufferSize(..) => back_buffer = ctxt.back_buffer().unwrap(),
 
                     WindowEvent::Key(k, _, Action::Press, _) => {
-                        TinController::on_event(TinEvent::KeyDown(map_key_to_tin_key(k).unwrap()), &mut scene, &mut view, handler)
+                        handler(TinEvent::KeyDown(map_key_to_tin_key(k).unwrap()), &mut scene, &mut view)
                     },
                     WindowEvent::Key(k, _, Action::Release, _) => {
 
-                        TinController::on_event(TinEvent::KeyUp(map_key_to_tin_key(k).unwrap()), &mut scene, &mut view, handler)
+                        handler(TinEvent::KeyUp(map_key_to_tin_key(k).unwrap()), &mut scene, &mut view)
                     },
                     WindowEvent::Key(_k, _, _, _) => {  },
 
                     WindowEvent::Pos(_, _) => {}
                     WindowEvent::Size(_, _) => {}
-                    WindowEvent::Refresh => {println!("Window refresh event");}
+                    WindowEvent::Refresh => {}
                     WindowEvent::Focus(_) => {}
                     WindowEvent::Iconify(_) => {}
 
                     WindowEvent::MouseButton(glfw::MouseButton::Button1, Action::Press, _) => {
-                        TinController::on_event(TinEvent::MouseDown(mouse_pos.clone()), &mut scene, &mut view, handler)
+                        handler(TinEvent::MouseDown(mouse_pos.clone()), &mut scene, &mut view)
                     }
                     WindowEvent::MouseButton(glfw::MouseButton::Button1, Action::Release, _) => {
-                        TinController::on_event(TinEvent::MouseUp(mouse_pos.clone()), &mut scene, &mut view, handler)
+                        handler(TinEvent::MouseUp(mouse_pos.clone()), &mut scene, &mut view)
                     }
                     WindowEvent::MouseButton(glfw::MouseButton::Button1, Action::Repeat, _) => {
                         
-                        TinController::on_event(TinEvent::MouseDown(mouse_pos.clone()), &mut scene, &mut view, handler)
+                        handler(TinEvent::MouseDown(mouse_pos.clone()), &mut scene, &mut view)
                     }
 
                     WindowEvent::MouseButton(glfw::MouseButton::Button2, Action::Press, _) => {
 
-                        TinController::on_event(TinEvent::RightMouseDown(mouse_pos.clone()), &mut scene, &mut view, handler)
+                        handler(TinEvent::RightMouseDown(mouse_pos.clone()), &mut scene, &mut view)
                     }
                     WindowEvent::MouseButton(glfw::MouseButton::Button2, Action::Release, _) => {
-                        TinController::on_event(TinEvent::RightMouseUp(mouse_pos.clone()), &mut scene, &mut view, handler)
+                        handler(TinEvent::RightMouseUp(mouse_pos.clone()), &mut scene, &mut view)
                     }
                     WindowEvent::MouseButton(glfw::MouseButton::Button2, Action::Repeat, _) => {
                         
-                        TinController::on_event(TinEvent::RightMouseDown(mouse_pos.clone()), &mut scene, &mut view, handler)
+                        handler(TinEvent::RightMouseDown(mouse_pos.clone()), &mut scene, &mut view)
                     }
 
                     WindowEvent::MouseButton(_, Action::Press, _) => {
-                        TinController::on_event(TinEvent::OtherMouseDown(mouse_pos.clone()), &mut scene, &mut view, handler)
+                        handler(TinEvent::OtherMouseDown(mouse_pos.clone()), &mut scene, &mut view)
                     }
                     WindowEvent::MouseButton(_, Action::Release, _) => {
-                        TinController::on_event(TinEvent::OtherMouseUp(mouse_pos.clone()), &mut scene, &mut view, handler)
+                        handler(TinEvent::OtherMouseUp(mouse_pos.clone()), &mut scene, &mut view)
                     }
                     WindowEvent::MouseButton(_, Action::Repeat, _) => {
-                        TinController::on_event(TinEvent::OtherMouseDown(mouse_pos.clone()), &mut scene, &mut view, handler)
+                        handler(TinEvent::OtherMouseDown(mouse_pos.clone()), &mut scene, &mut view)
                     }
                     
                     WindowEvent::CursorPos(x, y) => {
@@ -282,7 +247,7 @@ impl TBackend for LuminanceBackend {
             }
             
     
-            let mut tesses: Queue<Tess<luminance_gl::gl33::GL33, TinVertex>> = prepare_shapes_for_render(ctxt);
+            let mut tesses: Queue<Tess<GL33, TinVertex>> = prepare_shapes_for_render(ctxt);
     
             // rendering code goes here
     
@@ -332,10 +297,6 @@ impl TBackend for LuminanceBackend {
                 break 'apploop;
             }
         }
-        println!(
-            "Successfully executed Tin. {}",
-            "Now, to build drawing code!"
-        );
         Ok(())
     }
 }
@@ -360,7 +321,6 @@ fn produce_graphics_surface(view_ref: &TinView) -> GlfwSurface {
 
 
 fn prepare_shapes_for_render(context: &mut GL33Context) -> Queue<Tess<GL33, TinVertex>> {
-    println!("luminance::prepare_shapes_for_render()");
     let mut tesses: Queue<Tess<GL33, TinVertex>> = Queue::new();
     let shapes = &mut get_tin_mut().render.shape_queue;
     while !shapes.is_empty() {

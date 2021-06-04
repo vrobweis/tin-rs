@@ -1,6 +1,9 @@
-use crate::{Double, backends::TriangleRenderer, context::{DrawState, TBrush}, vector2::TVector2};
-
-use super::LuminanceBackend;
+use crate::{
+    Double, 
+    backends::{TriangleRenderer, luminance::LuminanceBackend}, 
+    context::{DrawState, TBrush}, 
+    vector2::TVector2
+};
 
 
 impl TriangleRenderer for LuminanceBackend {

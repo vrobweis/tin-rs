@@ -1,22 +1,6 @@
-//
-//  ImprovedNoise.swift
-//  Tin
-//
-//  Created by Loren Olson on 1/6/17.
-//  Created at the School of Arts, Media and Engineering,
-//  Herberger Institute for Design and the Arts,
-//  Arizona State University.
-//
-//  Swift implementation of Improved Noise by Ken Perlin.
-//  This port attempts to be Swift readable, yet stay
-//  very, very close to the original implementation.
-//
-
-
-
 #![allow(dead_code)]
 
-type Double = f64;
+use crate::Double;
 
 
 const PERMUTATION: [usize; 256] = [151,160,137,91,90,15,

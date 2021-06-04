@@ -81,7 +81,7 @@ struct Model {
 
 impl From<Vector2> for TinPoint {
     fn from(item: Vector2) -> Self {
-        TinPoint::new_from_coords(item.x as f64, item.y as f64)
+        TinPoint::new_from_coords(item.x as Double, item.y as Double)
     }
 }
 

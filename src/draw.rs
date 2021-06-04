@@ -76,7 +76,6 @@ pub fn line_width(width: &Double) {
 
 /// Draw a rectangle. Input is left, bottom coordinate and width, height size.
 pub fn rect(x: &Double, y: &Double, width: &Double, height: &Double) {
-    eprintln!("draw::rect()");
     let r = TinRect::new_from_dimensions( *x, *y, *width, *height);
     let mut tin = get_tin_mut();
     let brush = tin.get_brush();
@@ -97,7 +96,6 @@ pub fn rounded_rect(rect: &TinRect, radius_x: &Double, radius_y: &Double) {
 
 /// TODO: Document this function.
 pub fn triangle(x1: Double, y1: Double, x2: Double, y2: Double, x3: Double, y3: Double) {
-    eprintln!("draw::triangle()");
     let mut tin = get_tin_mut();
     let brush = tin.get_brush();
     let state = tin.get_state();

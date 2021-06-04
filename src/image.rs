@@ -11,12 +11,12 @@
 extern crate image;
 use image::{DynamicImage, GenericImageView, ImageError};
 
-use crate::{Double, draw::{image, image_with_size}, color::TColor};
+use crate::{Double, UInt, color::TColor, draw::{image, image_with_size}};
 
 pub struct TinImage {
     image: DynamicImage,
-    pub width: u32,
-    pub height: u32
+    pub width: UInt,
+    pub height: UInt
 }
 
 impl TinImage {
@@ -53,9 +53,9 @@ impl TinImage {
     }
     
     
-    pub fn color(&self, at_x: u32, at_y: u32) -> impl TColor {
+    pub fn color(&self, at_x: UInt, at_y: UInt) -> impl TColor {
         let p = self.image.get_pixel(at_x, at_y);
-        return u32::new_from_rgba(p.0[0] as f64, p.0[1] as f64, p.0[2] as f64, p.0[3] as f64);
+        return UInt::new_from_rgba(p.0[0] as Double, p.0[1] as Double, p.0[2] as Double, p.0[3] as Double);
     }
     
     

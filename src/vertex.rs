@@ -20,7 +20,7 @@ impl VertexRGB {
     }
 
     
-    pub fn new_from_f64(doubles: [f64;4]) -> Self {
+    pub fn new_from_Double(doubles: [Double;4]) -> Self {
         let mut new_color_array: [u8;4] = [0,0,0,0];
         for i in 0..4 {
             new_color_array[i] = (doubles[i] / 255.) as u8;
@@ -94,3 +94,6 @@ impl TinVertex {
     }
 }
 
+pub(crate) fn make_vertex(point: &TinPoint, color: &impl TColor) -> TinVertex {
+    TinVertex::new_from_point_and_color(point, color)
+}

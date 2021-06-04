@@ -1,20 +1,13 @@
-//
-//  TinColor.rs
-//  Tin
-//  
-//  Adapted by Vincent Weis on 5/9/2021
-//_____________________________________
-//  Original Swift version:
-//  TinColor.swift
-//  Tin
-//
-//  Created by Loren Olson on 3/10/17.
-//  Copyright © 2017 ASU. All rights reserved.
-//
-
-use super::{calculation::{constrain}, draw::{fill_color_from_rgba, stroke_color_from_rgba}, Double};
+use super::{
+    calculation::constrain, draw::{
+        fill_color_from_rgba, 
+        stroke_color_from_rgba
+    }, 
+    Double
+};
 
 pub struct TPixel {
+    pub location: [UInt;2],
     pub red: u8,
     pub green: u8,
     pub blue: u8,
@@ -22,8 +15,9 @@ pub struct TPixel {
 }
 
 impl TPixel {
-    pub fn new_from_rgba(red: u8, green: u8, blue: u8, alpha: u8) -> Self {
+    pub fn new_from_rgba(location: [UInt;2], red: u8, green: u8, blue: u8, alpha: u8) -> Self {
         Self {
+            location: location,
             red: red,
             green: green,
             blue: blue,
@@ -31,16 +25,16 @@ impl TPixel {
         }
     }
 
-    pub fn new_from_rgb(red: u8, green: u8, blue: u8) -> Self {
-        TPixel::new_from_rgba(red,green,blue,255 as u8)
+    pub fn new_from_rgb(location: [UInt;2], red: u8, green: u8, blue: u8) -> Self {
+        Self::new_from_rgba(location, red,green,blue,255 as u8)
     }
     
-    pub fn new_from_color(color: TinColor) -> Self {
+    pub fn new_from_color(location: [UInt;2], color: TinColor) -> Self {
         let r: u8 = constrain(color.red * 255.0, 0.0, 255.0) as u8;
         let g: u8 = constrain(color.green * 255.0, 0.0, 255.0) as u8;
         let b: u8 = constrain(color.blue * 255.0, 0.0, 255.0) as u8;
         let a: u8 = constrain(color.alpha * 255.0, 0.0, 255.0) as u8;
-        TPixel::new_from_rgba( r, g, b, a)
+        Self::new_from_rgba( location, r, g, b, a)
     }
 }
 
@@ -53,8 +47,8 @@ pub struct TinColor {
 }
 
 impl TinColor {
-    pub fn get_u32_repr(&self) -> u32 {
-        u32::new_from_rgba(self.get_red(), self.get_green(), self.get_blue(), self.get_alpha())
+    pub fn get_u32_repr(&self) -> UInt {
+        UInt::new_from_rgba(self.get_red(), self.get_green(), self.get_blue(), self.get_alpha())
     }
 }
 
@@ -110,8 +104,8 @@ impl TColor for TinColor {
 
 
 
-use crate::calculation::*;
-impl TColor for u32 {
+use crate::{UInt, calculation::*};
+impl TColor for UInt {
     fn new_from_rgba(red: Double, green: Double, blue: Double, alpha: Double) -> Self {
         let mut value: Self = 0x0;
         let mut values: [u8; 4] = [0,0,0,0];

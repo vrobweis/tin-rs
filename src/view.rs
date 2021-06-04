@@ -1,18 +1,10 @@
-//
-//  TView.swift
-//  Tin
-//
-//  Created by Loren Olson on 12/28/16.
-//  Created at the School of Arts, Media and Engineering,
-//  Herberger Institute for Design and the Arts,
-//  Arizona State University.
-//  Copyright (c) 2017 Arizona Board of Regents on behalf of Arizona State University
-//
+use crate::{UInt, UShort};
+
 use super::{frame::TinFrame};
 
 pub struct TinView {
     title: &'static str,
-    target_framerate: u16,
+    target_framerate: UShort,
     pub is_running: bool,
 
     frame: TinFrame,
@@ -26,7 +18,7 @@ impl TinView  {
     pub fn new(title: &'static str, frame: TinFrame) -> TinView {
         Self {
             title: title,
-            target_framerate: 60 as u16,
+            target_framerate: 60 as UShort,
             is_running: true,
             frame: frame,
             // FONT HERE
@@ -35,19 +27,19 @@ impl TinView  {
     }
     
     /// TODO: Document this method.
-    pub fn new_from_dimensions(title: &'static str, width: u32, height: u32) -> Self {
+    pub fn new_from_dimensions(title: &'static str, width: UInt, height: UInt) -> Self {
         //let newFrame = NSRect(x: 0.0, y: 0.0, width: width, height: height);
         let frame = TinFrame::new(width, height);
         Self::new(title, frame)
     }
 
     /// TODO: Document this method.
-    pub fn get_fps(&self) -> u16 {
+    pub fn get_fps(&self) -> UShort {
         self.target_framerate
     }
 
     /// TODO: Document this method.
-    pub fn set_fps(&mut self, fps: u16) {
+    pub fn set_fps(&mut self, fps: UShort) {
         self.target_framerate = fps;
     }
 

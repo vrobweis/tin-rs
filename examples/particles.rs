@@ -1,18 +1,18 @@
 use std::{ops::AddAssign};
 
-use tin::{color::{TColor, TinColor}, run, draw::*, event::TinEvent, frame::TinFrame, key::TinKey, random::random, scene::TScene, vector2::TVector2, view::TinView};
+use tin::{Double, UShort, color::{TColor, TinColor}, draw::*, event::TinEvent, frame::TinFrame, key::TinKey, random::random, run, scene::TScene, vector2::TVector2, view::TinView};
 
 #[derive(Clone, Debug)]
 struct Particle {
     center: TVector2,
-    size: f64,
-    rotation: f64,
+    size: Double,
+    rotation: Double,
     velocity: TVector2,
-    lifetime: u16,
+    lifetime: UShort,
     should_die: bool
 }
 
-const PARTICLE_LIFETIME: u16 = 240;
+const PARTICLE_LIFETIME: UShort = 240;
 
 impl Default for Particle {
     fn default() -> Self {
@@ -29,7 +29,7 @@ impl Default for Particle {
 }
 
 impl Particle {
-    fn new(center: TVector2, size: f64, rotation: f64, velocity: TVector2) -> Self {
+    fn new(center: TVector2, size: Double, rotation: Double, velocity: TVector2) -> Self {
         Particle {
             center: center,
             size: size,
@@ -56,16 +56,13 @@ impl Particle {
             TVector2::new_from_angle(0_f64.to_radians()),
             TVector2::new_from_angle(120_f64.to_radians())
         ];
-        println!("{:?}", vecs[1]);
         for vec in &mut vecs {
             vec.rotate(self.rotation);
             vec.set_magnitude(self.size);
             vec.add_assign(self.center);
         }
-        println!("{:?}", vecs[1]);
 
-        let a = tin::calculation::remap(self.lifetime as f64, PARTICLE_LIFETIME as f64, 0.0, 1.0, 0.0);
-        println!("a: {}", a);
+        let a = tin::calculation::remap(self.lifetime as Double, PARTICLE_LIFETIME as Double, 0.0, 1.0, 0.0);
         fill_color_from_rgba(&0.7, &0.7, &0.7, &a);
         triangle(vecs[0].x, vecs[0].y, vecs[1].x, vecs[1].y, vecs[2].x, vecs[2].y)
     }
@@ -109,14 +106,13 @@ impl ParticleSystem for Vec<Particle> {
 
 
 struct Scene {
-    time_elapsed: f64,
+    time_elapsed: Double,
     particles: Vec<Particle>
 }
 
 impl TScene for Scene {
 
     fn setup(&mut self) {
-        eprintln!("Scene::setup");
         self.particles = Vec::<Particle>::new();
 
         for _ in 0..5 {
@@ -126,12 +122,10 @@ impl TScene for Scene {
     }
 
     fn update(&mut self) {
-        eprintln!("Scene::update");
-        const RATE_OF_CHANGE: f64 = 0.0000001;
+        const RATE_OF_CHANGE: Double = 0.0000001;
         background(&0.5, &0.5, &0.5);
 
         let color: TinColor = TinColor::new_from_rgba(1.0, 0.1, 0.1, 1.0);
-        println!("3333");
         fill_color_from_color(&color);
 
         self.particles.update();

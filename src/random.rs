@@ -1,17 +1,7 @@
-//
-//  TRandom.swift
-//  Tin
-//
-//  Created by Loren Olson on 11/3/16.
-//  Created at the School of Arts, Media and Engineering,
-//  Herberger Institute for Design and the Arts,
-//  Arizona State University.
-//  Copyright (c) 2017 Arizona Board of Regents on behalf of Arizona State University
-//
 extern crate rand;
 
 use rand::{Rng, prelude::{ThreadRng}};
-use super::{Double};
+use crate::{Double};
 
 
 // TODO: Implement static vars here that can be globally used to produce random values

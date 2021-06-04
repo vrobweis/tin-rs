@@ -25,14 +25,19 @@ pub mod view;
 
 pub type Double = f64;
 pub type Float = f32;
+pub type Long = i64;
 pub type Int = i32;
+pub type Short = i16;
+pub type ULong = u64;
 pub type UInt = u32;
-pub type LongInt = i64;
+pub type UShort = u16;
+
 
 
 pub use context::run;
 
 
+pub(crate) type CurrentBackend = backends::luminance::LuminanceBackend;
 
 
 #[macro_use] pub(crate) mod tests;

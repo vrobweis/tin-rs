@@ -1,14 +1,16 @@
-use crate::{Double, backends::LineRenderer, context::{DrawState, TBrush, get_tin, get_tin_mut}, vector2::TVector2};
-
-use super::LuminanceBackend;
-
+use crate::{
+    Double, 
+    backends::{luminance::LuminanceBackend,LineRenderer},
+    context::{DrawState, TBrush}, 
+    vector2::TVector2
+};
 
 
 impl LineRenderer for LuminanceBackend {
-    // Draw line with previously set line width
+
+    /// TODO: Document this method.
     fn line(&mut self, x1: &Double, y1: &Double, x2: &Double, y2: &Double, width: &Double, brush: TBrush, state: DrawState) {
-        eprintln!("LuminanceBackend::line()");
-        let relative_width = get_tin().line_width/2.0;
+        let relative_width = width/2.0;
         let first_vector = TVector2::new_from_xy(*x1, *y1);
         let second_vector = TVector2::new_from_xy(*x2, *y2);
 
@@ -24,7 +26,6 @@ impl LineRenderer for LuminanceBackend {
             perpendicular_counter_clockwise_vector.set_magnitude(relative_width);
         }
         
-
         let points;
         {
             let side1_point1 = first_vector + perpendicular_counter_clockwise_vector;

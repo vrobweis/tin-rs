@@ -1,15 +1,6 @@
 use std::time::{Duration, Instant};
 
-//
-//  TStopwatch.swift
-//  Tin
-//
-//  Created by Loren Olson on 1/5/17.
-//  Created at the School of Arts, Media and Engineering,
-//  Herberger Institute for Design and the Arts,
-//  Arizona State University.
-//  Copyright (c) 2017 Arizona Board of Regents on behalf of Arizona State University
-//
+use crate::Double;
 
 /**
   A struct for simple timing.
@@ -18,7 +9,6 @@ use std::time::{Duration, Instant};
 pub struct TStopwatch {
     start_time: Instant
 }
-
 
 
 impl TStopwatch {
@@ -30,7 +20,7 @@ impl TStopwatch {
         self.get_elapsed_time().as_nanos()
     }
     
-    pub fn get_elapsed_seconds(&self) -> f64 {
+    pub fn get_elapsed_seconds(&self) -> Double {
         self.get_elapsed_time().as_secs_f64()
     }
     

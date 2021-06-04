@@ -1,7 +1,6 @@
 use crate::{key::TinKey, point::TinPoint};
 
 
-
 pub enum TinEvent {
     KeyDown(TinKey),
     KeyUp(TinKey),
