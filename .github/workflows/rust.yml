@@ -17,7 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Get additional Ubuntu dependency
-      run: sudo apt-get install -y libxrandr-dev
+      run: sudo apt-get install xorg-dev
     - name: Build
       run: cargo build --verbose
     - name: Run tests
