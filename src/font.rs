@@ -1,6 +1,6 @@
 
 extern crate font_kit;
-use font_kit::{family_name::FamilyName, properties::Properties, source::SystemSource,loaders::directwrite::Font as Font};
+use font_kit::{family_name::FamilyName, properties::Properties, sources::fs::FsSource as FontSource, font::Font as Font};
 
 use crate::{Double, draw::text};
 
@@ -34,7 +34,7 @@ pub struct TinFont {
 
 impl TinFont {
     pub fn new(family_name: FamilyName, size: f32) -> Result<Self, ()> {
-        let font = SystemSource::new().select_best_match(
+        let font = FontSource::new().select_best_match(
             &[family_name],
             &Properties::new())
             .unwrap()

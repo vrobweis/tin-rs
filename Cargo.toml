@@ -31,7 +31,7 @@ glutin = "0.26"
 # Used for features
 image = "0.23.14"
 chrono = "0.4"
-font-kit = "0.10.0"
+font-kit = {version = "0.10.0", features = ["loader-freetype"] } 
 rand = "0.8.3"
 
 # Used for global state
