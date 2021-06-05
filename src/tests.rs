@@ -65,8 +65,8 @@ mod calculation {
     #[test]
     // Test for mag() function.
     fn test_mag() {
-        let v: Double = mag(4.0, 2.0);
-        assert_roughly_eq!( v , 6.0);
+        let v: Double = mag(4.0, 4.0);
+        assert_roughly_eq!( v , sqrt(32.0));
     }
 
     #[test]
