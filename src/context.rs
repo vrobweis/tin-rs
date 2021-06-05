@@ -1,11 +1,5 @@
 
-use crate::ULong;
-
-use super::{
-    controller::TinController,
-    scene::TScene, 
-    view::TinView,
-    event::TinEvent,
+use crate::{
     frame::TinFrame, 
     point::TinPoint,
     backends::TBackend,
@@ -15,6 +9,8 @@ use super::{
     },
     Double,
     CurrentBackend,
+    ULong, 
+    point::TPoint
 };
 
 use lazy_static;
@@ -38,17 +34,15 @@ pub(crate) fn get_tin_mut<'t>() -> RwLockWriteGuard<'t, TinContext<CurrentBacken
     return TIN_LOCK.write().unwrap();
 }
 
-
-pub fn run<S,H>(tin_view: TinView, scene: S, handler: H) -> Result<(), ()> where S: TScene, H: Fn(TinEvent, &mut S, &mut TinView)  {
-    CurrentBackend::run(TinController::new(tin_view, scene, handler))
-}
-
 pub(crate) enum TBrush {
     Fill(TinColor), Stroke(TinColor), FillAndStroke(TinColor, TinColor), Disabled
 }
 
+#[derive(Debug, Clone, Copy)]
 pub(crate) struct DrawState {
     pub(crate) rotation: Double,
+    pub(crate) scale: Double,
+    pub(crate) translation: (Double, Double),
 }
 
 pub(crate) struct TinContext<T: TBackend> {
@@ -60,11 +54,9 @@ pub(crate) struct TinContext<T: TBackend> {
     pub mouse_pos: TinPoint,
     pub pmouse_pos: TinPoint,
     pub mouse_pressed: bool,
-    pub frame_count: ULong,
+    frame_count: ULong,
 
-    pub(crate) rotation: Double,
-    pub(crate) scale: Double,
-    pub(crate) translation: (Double, Double),
+    pub state: DrawState,
 
     pub fill: bool,
     pub stroke: bool,
@@ -96,9 +88,12 @@ impl<T: TBackend> TinContext<T> {
             mouse_pressed: false,
             frame_count: 0,
             
-            rotation: 0.0,
-            scale: 1.0,
-            translation: (0.0,0.0),
+            state: DrawState {
+                rotation: 0.0,
+                scale: 1.0,
+                translation: (0.0,0.0),
+            },
+            
 
             current_fill_color: DEFAULT_COLOR_FILL,
             current_stroke_color: DEFAULT_COLOR_STROKE,
@@ -125,9 +120,7 @@ impl<T: TBackend> TinContext<T> {
     }
 
     pub fn get_state(&self) -> DrawState {
-        DrawState {
-            rotation: self.rotation
-        }
+        self.state.clone()
     }
 
     /// TODO: Document this method.
@@ -143,10 +136,8 @@ impl<T: TBackend> TinContext<T> {
     
     /// TODO: Document this method.
     pub fn prepare_for_update(&mut self) {
-        self.set_fill_color_with_color(&DEFAULT_COLOR_FILL);
-        self.set_stroke_color_with_color(&DEFAULT_COLOR_STROKE);
-        self.current_background_color = DEFAULT_COLOR_BACKGROUND;
-
+        self.reset(self.width, self.height);
+        self.update_frame_count();
         {
             assert_eq!(self.current_fill_color, DEFAULT_COLOR_FILL);
             assert_eq!(self.current_stroke_color, DEFAULT_COLOR_STROKE);
@@ -184,47 +175,55 @@ impl<T: TBackend> TinContext<T> {
         
         self.set_fill_color_with_color(&DEFAULT_COLOR_FILL);
         self.set_stroke_color_with_color(&DEFAULT_COLOR_STROKE);
+        self.current_background_color = DEFAULT_COLOR_BACKGROUND;
     }
     
 
     /// TODO: Document this function.
-    pub fn mouse_moved(&mut self, to_point: TinPoint) {
+    pub fn mouse_moved(&mut self, to_point: impl TPoint) {
         self.pmouse_pos = self.mouse_pos.clone();
-        self.mouse_pos = to_point;
+        {
+            self.mouse_pos.set_x(to_point.get_x());
+            self.mouse_pos.set_y(to_point.get_y());
+        }
+    }
+
+    pub fn get_frame_count(&self) -> ULong {
+        self.frame_count
     }
     
     /// TODO: Document this function.
-    pub fn update_frame_count(&mut self) {
+    fn update_frame_count(&mut self) {
         self.frame_count += 1;
     }
     
     // MARK: - Color state
     
-    pub fn set_stroke_color(&mut self, red: &Double, green: &Double, blue: &Double, alpha: &Double) {
-        self.current_stroke_color = TinColor::new_from_rgba(*red, *green, *blue, *alpha);
+    pub fn set_stroke_color(&mut self, red: Double, green: Double, blue: Double, alpha: Double) {
+        self.current_stroke_color = TinColor::new_from_rgba(red, green, blue, alpha);
     }
     pub fn set_stroke_color_with_color(&mut self, color: &impl TColor) {
-        self.set_stroke_color(&color.get_red(), &color.get_green(), &color.get_blue(), &color.get_alpha())
+        self.set_stroke_color(color.get_red(), color.get_green(), color.get_blue(), color.get_alpha())
     }
     
     
     
     
-    pub fn set_fill_color(&mut self, red: &Double, green: &Double, blue: &Double, alpha: &Double) {
-        self.current_fill_color = TinColor::new_from_rgba(*red, *green, *blue, *alpha);
+    pub fn set_fill_color(&mut self, red: Double, green: Double, blue: Double, alpha: Double) {
+        self.current_fill_color = TinColor::new_from_rgba(red, green, blue, alpha);
     }
 
     pub fn set_fill_color_with_color(&mut self, color: &impl TColor) {
-        self.set_fill_color(&color.get_red(), &color.get_green(), &color.get_blue(), &color.get_alpha())
+        self.set_fill_color(color.get_red(), color.get_green(), color.get_blue(), color.get_alpha())
     }
 
 
-    pub fn set_background_color(&mut self, red: &Double, green: &Double, blue: &Double, alpha: &Double) {
-        self.current_background_color = TinColor::new_from_rgba(*red, *green, *blue, *alpha);
+    pub fn set_background_color(&mut self, red: Double, green: Double, blue: Double, alpha: Double) {
+        self.current_background_color = TinColor::new_from_rgba(red, green, blue, alpha);
     }
 
     pub fn set_background_color_with_color(&mut self, color: &impl TColor) {
-        self.set_background_color(&color.get_red(), &color.get_green(), &color.get_blue(), &color.get_alpha())
+        self.set_background_color(color.get_red(), color.get_green(), color.get_blue(), color.get_alpha())
     }
     
     
@@ -241,20 +240,20 @@ impl<T: TBackend> TinContext<T> {
         return self.current_background_color
     }
     
-    pub fn set_alpha(&mut self, alpha: &Double) {
+    pub fn set_alpha(&mut self, alpha: Double) {
         {
             let current_color = self.current_fill_color;
             let red = current_color.red;
             let green = current_color.green;
             let blue = current_color.blue;
-            self.current_fill_color = TinColor::new_from_rgba(red, green, blue, *alpha);
+            self.current_fill_color = TinColor::new_from_rgba(red, green, blue, alpha);
         }
         {
             let current_color = self.current_stroke_color;
             let red = current_color.red;
             let green = current_color.green;
             let blue = current_color.blue;
-            self.current_stroke_color =TinColor::new_from_rgba(red, green, blue, *alpha);
+            self.current_stroke_color =TinColor::new_from_rgba(red, green, blue, alpha);
         }
     }
 }

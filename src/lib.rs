@@ -9,7 +9,6 @@ pub mod key;
 pub mod noise;
 pub mod color;
 pub(crate) mod context;
-pub mod controller;
 pub mod font;
 pub mod frame;
 pub mod image;
@@ -32,9 +31,12 @@ pub type ULong = u64;
 pub type UInt = u32;
 pub type UShort = u16;
 
+pub(crate) mod private {
+    pub trait Sealed {}
+}
 
-
-pub use context::run;
+pub(crate) mod app;
+pub use app::*;
 
 
 pub(crate) type CurrentBackend = backends::luminance::LuminanceBackend;

@@ -1,12 +1,7 @@
-use crate::{
-    backends::{
-        luminance::{LuminanceBackend, make_shape_from_vertex_vec, make_vertex}, 
+use crate::{backends::{
+        luminance::{LuminanceBackend, make_shape_from_vertex_vec}, 
         PathRenderer
-    }, 
-    point::TinPoint, 
-    context::get_tin, 
-    vertex::TinVertex
-};
+    }, point::{TPoint}, vertex::TinVertex};
 
 
 impl PathRenderer for LuminanceBackend {
@@ -15,11 +10,11 @@ impl PathRenderer for LuminanceBackend {
         self.path_started = true;
     }
     
-    fn path_vertex(&mut self, at_point: &TinPoint) {
+    fn path_vertex(&mut self, at_point: &impl TPoint) {
         todo!("path_vertex method in LuminanceBackend not supported yet");
     }
     
-    fn path_add_curve(&mut self, to: &TinPoint, control1: &TinPoint, control2: &TinPoint) {
+    fn path_add_curve(&mut self, to: &impl TPoint, control1: &impl TPoint, control2: &impl TPoint) {
         todo!("path_add_curve method in LuminanceBackend not supported yet");
     }
     

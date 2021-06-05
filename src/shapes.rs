@@ -77,7 +77,7 @@ pub struct TinRect {
 impl TinRect {
     pub fn new_from_dimensions(x: Double, y: Double, w: Double, h: Double) -> Self {
         Self {
-            x: x, y: y, width: w.abs(), height: h.abs()
+            x, y, width: w.abs(), height: h.abs()
         }
     }
 

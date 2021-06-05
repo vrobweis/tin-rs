@@ -2,7 +2,7 @@
 extern crate font_kit;
 use font_kit::{family_name::FamilyName, properties::Properties, sources::fs::FsSource as FontSource, font::Font as Font};
 
-use crate::{Double, draw::text};
+use crate::{Double, Float, draw::text};
 
 
 pub enum TinFontHorizontalAlignment {
@@ -22,18 +22,18 @@ pub enum TinTextAlignment {
 
 pub struct TinFont {
     font: Font,
-    font_size: f32,
-    pub line_height_multiple: f32,
+    font_size: Float,
+    pub line_height_multiple: Float,
     
     pub horizontal_alignment: TinFontHorizontalAlignment,
     pub vertical_alignment: TinFontVerticalAlignment,
     pub paragraph_alignment: TinTextAlignment,
-    pub kerning: f32
+    pub kerning: Float
 }
 
 
 impl TinFont {
-    pub fn new(family_name: FamilyName, size: f32) -> Result<Self, ()> {
+    pub fn new(family_name: FamilyName, size: Float) -> Result<Self, ()> {
         let font = FontSource::new().select_best_match(
             &[family_name],
             &Properties::new())
@@ -57,7 +57,7 @@ impl TinFont {
         todo!("Incomplete: Tin Font support not implemented");
     }
 
-    pub fn draw(&self, message: &String, x: &Double, y: &Double) {
+    pub fn draw(&self, message: &String, x: Double, y: Double) {
         text(message, &self, x, y)
     }
 }

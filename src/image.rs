@@ -63,11 +63,11 @@ impl TinImage {
     //func image(image: TinImage<'a>, x: Double, y: Double)
     //func image(image: TinImage<'a>, x: Double, y: Double, width: Double, height: Double)
 
-    pub fn draw(&self, x: &Double, y: &Double) {
+    pub fn draw(&self, x: Double, y: Double) {
         image(self, x, y);
     }
     
-    pub fn draw_with_size(&self, x: &Double, y: &Double, width: &Double, height: &Double) {
+    pub fn draw_with_size(&self, x: Double, y: Double, width: Double, height: Double) {
         image_with_size(self, x, y, width, height);
     }
 }

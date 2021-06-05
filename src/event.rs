@@ -1,5 +1,7 @@
-use crate::{key::TinKey, point::TinPoint};
+use crate::{key::TinKey, point::TinPoint, scene::TScene};
 
+#[allow(type_alias_bounds)]
+pub(crate) type TEventHandler<S: TScene> = fn(TinEvent, &mut S, &mut crate::view::TinView);
 
 pub enum TinEvent {
     KeyDown(TinKey),

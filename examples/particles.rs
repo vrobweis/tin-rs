@@ -1,6 +1,6 @@
-use std::{ops::AddAssign};
+use std::ops::AddAssign;
 
-use tin::{Double, UShort, color::{TColor, TinColor}, draw::*, event::TinEvent, frame::TinFrame, key::TinKey, random::random, run, scene::TScene, vector2::TVector2, view::TinView};
+use tin::{Double, UShort, color::{TColor, TinColor}, draw::*, event::TinEvent, frame::TinFrame, key::TinKey, random::random, scene::TScene, vector2::TVector2, view::TinView};
 
 #[derive(Clone, Debug)]
 struct Particle {
@@ -18,7 +18,7 @@ impl Default for Particle {
     fn default() -> Self {
         let mut v = TVector2::new_from_angle(random(0.0,360.0 ).to_radians());
         v.set_magnitude(0.0013);
-        let r = tin::random::random(0.0, std::f64::consts::FRAC_2_PI);
+        let r = random(0.0, std::f64::consts::FRAC_2_PI);
         Self::new(
             TVector2::new_from_xy(0.0, 0.0),
             0.2,
@@ -63,7 +63,7 @@ impl Particle {
         }
 
         let a = tin::calculation::remap(self.lifetime as Double, PARTICLE_LIFETIME as Double, 0.0, 1.0, 0.0);
-        fill_color_from_rgba(&0.7, &0.7, &0.7, &a);
+        fill_color_from_rgba(0.7, 0.7, 0.7, a);
         triangle(vecs[0].x, vecs[0].y, vecs[1].x, vecs[1].y, vecs[2].x, vecs[2].y)
     }
 }
@@ -123,7 +123,7 @@ impl TScene for Scene {
 
     fn update(&mut self) {
         const RATE_OF_CHANGE: Double = 0.0000001;
-        background(&0.5, &0.5, &0.5);
+        background(0.5, 0.5, 0.5);
 
         let color: TinColor = TinColor::new_from_rgba(1.0, 0.1, 0.1, 1.0);
         fill_color_from_color(&color);
@@ -154,7 +154,7 @@ fn main() {
     let test_view = TinView::new("title", frame);
 
     std::process::exit(
-        match run(test_view, scene, handler_test) { 
+        match tin::TinApp::app(scene).view(test_view).event(handler_test).run() { 
             Ok(_) => 0,
             Err(err) => {
                 eprintln!("error: {:?}", err);

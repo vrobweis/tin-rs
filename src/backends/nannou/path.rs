@@ -1,4 +1,4 @@
-use crate::{backends::PathRenderer, point::TinPoint, context::get_tin, vertex::TinVertex};
+use crate::{backends::PathRenderer, context::get_tin, point::{TPoint, TinPoint}, vertex::TinVertex};
 
 use super::{NannouBackend, make_shape_from_vertex_vec, make_vertex};
 
@@ -11,11 +11,11 @@ impl PathRenderer for NannouBackend {
         self.path_started = true
     }
     
-    fn path_vertex(&mut self, at_point: &TinPoint) {
+    fn path_vertex(&mut self, at_point: &impl TPoint) {
         self.path_vertices.push_back(make_vertex(at_point, &get_tin().get_fill_color()));
     }
     
-    fn path_add_curve(&mut self, to: &TinPoint, control1: &TinPoint, control2: &TinPoint) {
+    fn path_add_curve(&mut self, to: &impl TPoint, control1: &impl TPoint, control2: &impl TPoint) {
         todo!("path_add_curve method in NannouBackend not supported yet");
         //cg.addCurve(to: to, control1: control1, control2: control2)
     }

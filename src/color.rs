@@ -226,19 +226,19 @@ pub trait TColor {
     
     
     fn set_fill_color(&self) {
-        let r = &self.get_red();
-        let g = &self.get_green();
-        let b = &self.get_blue();
-        let a = &self.get_alpha();
+        let r = self.get_red();
+        let g = self.get_green();
+        let b = self.get_blue();
+        let a = self.get_alpha();
         fill_color_from_rgba(r, g, b, a);
     }
     
     
     fn set_stroke_color(&self) {
-        let r = &self.get_red();
-        let g = &self.get_green();
-        let b = &self.get_blue();
-        let a = &self.get_alpha();
+        let r = self.get_red();
+        let g = self.get_green();
+        let b = self.get_blue();
+        let a = self.get_alpha();
         stroke_color_from_rgba(r, g, b, a);
     }
     

@@ -3,13 +3,13 @@ pub(crate) mod luminance;
 
 // pub(crate) mod nannou; 
 
-use crate::{Double, Float, UInt, ULong, UShort, context::{DrawState, TBrush}, controller::TinController, event::TinEvent, font::TinFont, frame::TinFrame, image::TinImage, point::TinPoint, scene::TScene, shapes::TinRect, view::TinView};
+use crate::{Double, Float, TinApp, UInt, ULong, UShort, context::{DrawState, TBrush}, font::TinFont, frame::TinFrame, image::TinImage, point::{TPoint}, scene::TScene, shapes::TinRect};
 
 
 pub(crate) trait TBackend: TinRenderer {
     fn new() -> Self;
 
-    fn run<S, H>(controller: TinController<S,H>) -> Result<(), ()> where S: TScene, H: Fn(TinEvent, &mut S, &mut TinView) ;
+    fn run<S>(app: TinApp<S>) -> Result<(), ()> where S: TScene ;
 }
 
 pub(crate) trait TinRenderer: /*BackgroundRenderer +*/ RectRenderer + TriangleRenderer 
@@ -29,49 +29,49 @@ pub(crate) trait TinRenderer: /*BackgroundRenderer +*/ RectRenderer + TriangleRe
 }
 
 pub(crate) trait RectRenderer {
-    fn rect(&mut self, x: &Double, y: &Double, w: &Double, h: &Double, brush: TBrush, state: DrawState) {    
-        self.rect_with_tinrect(&TinRect::new_from_dimensions(*x, *y, *w, *h), brush, state);
+    fn rect(&mut self, x: Double, y: Double, w: Double, h: Double, brush: TBrush, state: DrawState) {    
+        self.rect_with_tinrect(&TinRect::new_from_dimensions(x, y, w, h), brush, state);
     }
     fn rect_with_tinrect(&mut self, with_rect: &TinRect, brush: TBrush, state: DrawState);
-    fn rounded_rect(&mut self, rect: &TinRect, radius_x: &Double, radius_y: &Double, brush: TBrush, state: DrawState);
+    fn rounded_rect(&mut self, rect: &TinRect, radius_x: Double, radius_y: Double, brush: TBrush, state: DrawState);
 }
 
 pub(crate) trait TriangleRenderer {
-    fn triangle(&mut self, x1: &Double, y1: &Double, x2: &Double, y2: &Double, x3: &Double, y3: &Double, brush: TBrush, state: DrawState);
+    fn triangle(&mut self, x1: Double, y1: Double, x2: Double, y2: Double, x3: Double, y3: Double, brush: TBrush, state: DrawState);
 }
 pub(crate) trait LineRenderer {
-    fn line(&mut self, x1: &Double, y1: &Double, x2: &Double, y2: &Double, width: &Double, brush: TBrush, state: DrawState);
+    fn line(&mut self, x1: Double, y1: Double, x2: Double, y2: Double, width: Double, brush: TBrush, state: DrawState);
 }
 
 pub(crate) trait ArcRenderer {
-    fn arc(&mut self, x: &Double, y: &Double, radius: &Double, start_angle: &Double, end_angle: &Double, brush: TBrush, state: DrawState);
+    fn arc(&mut self, x: Double, y: Double, radius: Double, start_angle: Double, end_angle: Double, brush: TBrush, state: DrawState);
 }
 
 pub(crate) trait EllipseRenderer {
-    fn ellipse(&mut self, x: &Double, y: &Double, w: &Double, h: &Double, brush: TBrush, state: DrawState);
+    fn ellipse(&mut self, x: Double, y: Double, w: Double, h: Double, brush: TBrush, state: DrawState);
     fn ellipse_in_tinrect(&mut self, in_rect: &TinRect, brush: TBrush, state: DrawState) {
-        self.ellipse(&in_rect.x, &in_rect.y, &in_rect.get_width(), &in_rect.get_height(), brush, state);
+        self.ellipse(in_rect.x, in_rect.y, in_rect.get_width(), in_rect.get_height(), brush, state);
     }
 }
 
 pub(crate) trait PathRenderer {
     fn path_begin(&mut self);
-    fn path_vertex(&mut self, at_point: &TinPoint);
-    fn path_add_curve(&mut self, to: &TinPoint, control1: &TinPoint, control2: &TinPoint);
+    fn path_vertex(&mut self, at_point: &impl TPoint);
+    fn path_add_curve(&mut self, to: &impl TPoint, control1: &impl TPoint, control2: &impl TPoint);
     fn path_end(&mut self);
 }
 
 pub(crate) trait ImageRenderer {
-    fn image(&mut self, image: &TinImage, x: &Double, y: &Double) {
-        self.image_with_size(image, x, y, &(image.width as Double), &(image.height as Double))
+    fn image(&mut self, image: &TinImage, x: Double, y: Double) {
+        self.image_with_size(image, x, y, image.width as Double, image.height as Double)
     }
     
     
-    fn image_with_size(&mut self, image: &TinImage, x: &Double, y: &Double, width: &Double, height: &Double) {
+    fn image_with_size(&mut self, image: &TinImage, x: Double, y: Double, width: Double, height: Double) {
         self.image_with_size_and_resize(image, x, y, width, height, false);
     }
 
-    fn image_with_size_and_resize(&mut self, image: &TinImage, x: &Double, y: &Double, width: &Double, height: &Double, resize: bool);
+    fn image_with_size_and_resize(&mut self, image: &TinImage, x: Double, y: Double, width: Double, height: Double, resize: bool);
 }
 
 pub(crate) trait StatefulRenderer {
@@ -98,7 +98,7 @@ pub(crate) trait StatefulRenderer {
 
 
 pub(crate) trait TextRenderer {
-    fn text(&mut self, message: &String, font: &TinFont, x: &Double, y: &Double); // TODO: Implement TFont
+    fn text(&mut self, message: &String, font: &TinFont, x: Double, y: Double); // TODO: Implement TFont
 }
 
 use std::{

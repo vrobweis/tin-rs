@@ -7,7 +7,7 @@ use crate::{
 
 impl TextRenderer for LuminanceBackend {
     
-    fn text(&mut self, message: &String, font: &TinFont, x: &Double, y: &Double) {
+    fn text(&mut self, message: &String, font: &TinFont, x: Double, y: Double) {
         todo!("text method in LuminanceBackend not supported yet");
     }
 

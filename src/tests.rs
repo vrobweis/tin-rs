@@ -29,6 +29,7 @@ mod color {
 mod calculation {
     use super::*;
     use crate::{Double, calculation::*};
+    use std::f64::consts::FRAC_PI_2;
 
     #[test]
     /// Test for constrain() function.
@@ -84,7 +85,6 @@ mod calculation {
     }
 
 
-use std::f64::consts::FRAC_PI_2;
     #[test]
     // Test for sq() function.
     fn test_sq() {

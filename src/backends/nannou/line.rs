@@ -6,8 +6,7 @@ use super::NannouBackend;
 
 impl LineRenderer for NannouBackend {
     // Draw line with previously set line width
-    fn line(&mut self, x1: &Double, y1: &Double, x2: &Double, y2: &Double) {
-        eprintln!("NannouBackend::line()");
+    fn line(&mut self, x1: Double, y1: Double, x2: Double, y2: Double) {
         let relative_width = self.line_width/2.0;
         let first_vector = TVector2::new_from_xy(*x1, *y1);
         let second_vector = TVector2::new_from_xy(*x2, *y2);
@@ -44,10 +43,5 @@ impl LineRenderer for NannouBackend {
         self.enqueue_shape(points);
     }
     
-    
-    // Set line width
-    fn line_width(&mut self, width: &Double) {
-        self.line_width = *width;
-        //cg.setline_width(CGFloat(width));
-    }
 }
+

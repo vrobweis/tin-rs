@@ -1,15 +1,60 @@
 
-use crate::Double;
-pub struct TinPoint {
-    pub x: Double,
-    pub y: Double
-}
+use crate::{Double, calculation::{sq, sqrt}, private::Sealed};
+pub trait TPoint: Sealed {
+    fn new_from_coords(x: Double, y: Double) -> Self;
 
-impl TinPoint {
-    pub fn new_from_coords(x: Double, y: Double) -> Self {
-        Self { x: x, y: y }
+    fn set_x(&mut self, x: Double);
+    fn set_y(&mut self, y: Double);
+
+    fn get_x(&self) -> Double;
+    fn get_y(&self) -> Double;
+
+    fn set_polar_angle(&mut self, theta: Double) {
+        self.set_x(self.get_polar_radius() * theta.cos());
+        self.set_y(self.get_polar_radius() * theta.sin());
+    }
+    fn set_polar_radius(&mut self, r: Double) {
+        self.set_x(r * self.get_polar_angle().cos());
+        self.set_y(r * self.get_polar_angle().sin());
+    }
+
+    fn get_polar_angle(&self) -> Double {
+        (self.get_y() / self.get_x()).atan()
+    }
+    fn get_polar_radius(&self) -> Double {
+        sqrt(sq(self.get_x()) + sq(self.get_y()))
     }
 }
+
+
+pub struct TinPoint {
+    x: Double,
+    y: Double
+}
+
+impl TPoint for TinPoint {
+    fn new_from_coords(x: Double, y: Double) -> Self {
+        Self { x: x, y: y }
+    }
+
+    fn set_x(&mut self, x: Double) {
+        self.x = x
+    }
+
+    fn set_y(&mut self, y: Double) {
+        self.y = y
+    }
+
+    fn get_x(&self) -> Double {
+        self.x
+    }
+
+    fn get_y(&self) -> Double {
+        self.y
+    }
+
+}
+impl Sealed for TinPoint {}
 
 impl Default for TinPoint {
     fn default() -> Self {
@@ -26,7 +71,51 @@ impl Clone for TinPoint {
     }
 }
 
+impl TPoint for (Double, Double) {
+    fn new_from_coords(x: Double, y: Double) -> Self {
+        (x,y)
+    }
 
+    fn set_x(&mut self, x: Double) {
+        self.0 = x
+    }
+
+    fn set_y(&mut self, y: Double) {
+        self.1 = y
+    }
+
+    fn get_x(&self) -> Double {
+        self.0
+    }
+
+    fn get_y(&self) -> Double {
+        self.1
+    }
+}
+impl Sealed for (Double, Double) {}
+
+impl TPoint for [Double; 2] {
+    fn new_from_coords(x: Double, y: Double) -> Self {
+        [x,y]
+    }
+
+    fn set_x(&mut self, x: Double) {
+        self[0] = x
+    }
+
+    fn set_y(&mut self, y: Double) {
+        self[1] = y
+    }
+
+    fn get_x(&self) -> Double {
+        self[0]
+    }
+
+    fn get_y(&self) -> Double {
+        self[1]
+    }
+}
+impl Sealed for [Double; 2] {}
 /*
 TODO: Implement new point and angle types for Tin
 

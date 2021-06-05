@@ -1,8 +1,6 @@
 use luminance_derive::{Semantics, Vertex};
 
-use crate::{color::TColor, vector2::TVector2};
-
-use super::{calculation::remap, point::TinPoint, Double, Float};
+use crate::{color::TColor, point::TPoint, vector2::TVector2, calculation::remap, Double, Float};
 
 
 #[derive(Copy, Clone, Debug, Semantics)]
@@ -20,7 +18,7 @@ impl VertexRGB {
     }
 
     
-    pub fn new_from_Double(doubles: [Double;4]) -> Self {
+    pub fn new_from_doubles(doubles: [Double;4]) -> Self {
         let mut new_color_array: [u8;4] = [0,0,0,0];
         for i in 0..4 {
             new_color_array[i] = (doubles[i] / 255.) as u8;
@@ -41,7 +39,7 @@ pub struct TinVertex {
 }
 
 impl TinVertex {
-    pub fn new_from_point_and_color(point: &TinPoint, color: &impl TColor) -> Self {
+    pub fn new_from_point_and_color(point: &impl TPoint, color: &impl TColor) -> Self {
         let r: Double; let g: Double; let b: Double; let a: Double;
         r = color.get_red();
         g = color.get_green();
@@ -62,7 +60,7 @@ impl TinVertex {
         };
 
         Self{
-            position: VertexPosition::new([point.x as Float, point.y as Float]),
+            position: VertexPosition::new([point.get_x() as Float, point.get_y() as Float]),
             color: VertexRGB::new(new_color)
         }
     }
@@ -94,6 +92,3 @@ impl TinVertex {
     }
 }
 
-pub(crate) fn make_vertex(point: &TinPoint, color: &impl TColor) -> TinVertex {
-    TinVertex::new_from_point_and_color(point, color)
-}

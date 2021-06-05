@@ -5,7 +5,7 @@ use super::NannouBackend;
 
 
 impl RectRenderer for NannouBackend {
-    fn rect(&mut self, x: &Double, y: &Double, w: &Double, h: &Double) {    
+    fn rect(&mut self, x: Double, y: Double, w: Double, h: Double) {    
         eprintln!("NannouBackend::rect()");
         self.rect_with_tinrect(&TinRect::new_from_dimensions(*x, *y, *w, *h));
     }
@@ -25,7 +25,7 @@ impl RectRenderer for NannouBackend {
         self.enqueue_shape(Vec::from([point1.clone(),point2,point3,point4,point1]));
     }
     
-    fn rounded_rect(&mut self, rect: &TinRect, radius_x: &Double, radius_y: &Double) {
+    fn rounded_rect(&mut self, rect: &TinRect, radius_x: Double, radius_y: Double) {
         todo!("rounded_rect method in NannouBackend not supported yet");
         /* 
         let bezier = NSBezierPath(rounded_rect: rect, radius_x: CGFloat(radius_x), radius_y: CGFloat(radius_y))

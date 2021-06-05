@@ -13,7 +13,7 @@ pub(crate) mod triangle;
 use nannou::prelude::*;
 
 
-use crate::{app::TinApp, context::get_tin_mut, event::TinEvent};
+use crate::{TinApp, context::get_tin_mut, event::{TEventHandler, TinEvent}, point::TPoint, scene::TScene};
 
 use super::{
     super::{
@@ -35,7 +35,7 @@ const VS_STR: &str = include_str!("shaders/vertexshader.glsl");
 const FS_STR: &str = include_str!("shaders/fragmentshader.glsl");
 
 
-fn make_vertex(point: &TinPoint, color: &TinColor) -> TinVertex {
+fn make_vertex(point: &impl TPoint, color: &TinColor) -> TinVertex {
     TinVertex::new_from_point_and_color(point, color)
 }
 
@@ -75,8 +75,7 @@ pub struct NannouBackend {
 
 struct Model {
     // Store the window ID so we can refer to this specific window later if needed.
-    _window: WindowId,
-    controller: TinController
+    _window: WindowId
 }
 
 impl From<Vector2> for TinPoint {
@@ -86,8 +85,6 @@ impl From<Vector2> for TinPoint {
 }
 
 impl NannouBackend {
-
-    
     
     fn model(app: &App) -> Model {
         // Create a new window! Store the ID so we can refer to it later.
@@ -100,26 +97,20 @@ impl NannouBackend {
         .build()
         .unwrap();
         
-        Model { _window, controller: TinController::new()}
+        Model { _window}
     }
     
     // Handle events related to the window and update the model if necessary
-    fn event(_app: &App, _model: &mut Model, event: WindowEvent) {
+    fn event(_app: &App, model: &mut Model, event: WindowEvent) {
         // handle events
-
-        let controller = &mut _model.controller;
 
         let mouse_pos = _app.mouse.position();
         let mouse_pos_point: TinPoint = TinPoint::from(mouse_pos);
 
-        let view = &mut controller.tin_view;
+        let handler = model.handler;
+        let scene = model.scene;
+        let view = model.view;
 
-        let scene_opt = controller.tin_view.scene.as_mut();
-        let scene;
-        match scene_opt {
-            Some(s) => scene = s,
-            None => todo!(),
-        }
 
         match event {
             Moved(_) => {}
@@ -293,7 +284,7 @@ impl TBackend for NannouBackend {
         }
     }
 
-    fn run(mut app: TinApp) -> Result<(), ()> {
+    fn run<S>(mut app: TinApp<S>) -> Result<(),()> where S: TScene {
         eprintln!("NannouBackend::run()");
         // Application logic here
 
@@ -303,7 +294,13 @@ impl TBackend for NannouBackend {
         .run();
 
         {
-            controller.get_view_mut().draw()
+            get_tin_mut().prepare_for_update();
+        }
+        app.scene.update();
+        
+        // Performance debugging display should be rendered here
+        {
+            get_tin_mut().did_finish_update();
         }
         
         

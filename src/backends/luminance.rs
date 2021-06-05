@@ -22,20 +22,7 @@ use luminance_windowing::{WindowDim, WindowOpt};
 use std::{collections::VecDeque as Queue, time::Instant};
 
 
-use crate::{
-    Float, 
-    color::TColor, 
-    controller::TinController, 
-    vertex::TinVertexSemantics,
-    context::{get_tin, get_tin_mut},
-    point::TinPoint, 
-    shapes::*, 
-    vector2::TVector2, 
-    vertex::*,
-    event::TinEvent, 
-    scene::TScene,
-    backends::{TinRenderer, TBackend},
-};
+use crate::{Float, TinApp, backends::{TinRenderer, TBackend}, color::TColor, context::{get_tin, get_tin_mut}, event::TinEvent, point::{TPoint, TinPoint}, scene::TScene, shapes::*, vector2::TVector2, vertex::TinVertexSemantics, vertex::*};
 
 pub(crate) struct LuminanceBackend {
     pub shape_queue: Queue<TinShape>,
@@ -131,11 +118,11 @@ impl TBackend for LuminanceBackend {
         }
     }
 
-    fn run<S, H>(mut controller: TinController<S, H>) -> Result<(), ()> where S: TScene, H: Fn(TinEvent, &mut S, &mut TinView) {
+    fn run<S>(app: TinApp<S>) -> Result<(), ()> where S: TScene {
         eprintln!("LuminanceBackend::run()");
         // Application logic here
 
-        let mut view = controller.tin_view;
+        let mut view = app.view;
 
         let mut surface = produce_graphics_surface(&view);
 
@@ -163,14 +150,22 @@ impl TBackend for LuminanceBackend {
 
         
 
-        let mut scene = controller.scene;
+        let mut scene = app.scene;
 
-        let handler = &mut controller.handler;
+        let handler = app.handler;
         
 
         'apploop: loop {
 
-            TinController::<S,H>::draw(&mut scene);
+            {
+                get_tin_mut().prepare_for_update();
+            }
+            scene.update();
+            
+            // Performance debugging display should be rendered here
+            {
+                get_tin_mut().did_finish_update();
+            }
             
 
     
@@ -353,7 +348,6 @@ use glfw::Key;
 use crate::{context::{DrawState, TBrush}, key::TinKey, view::TinView};
 
 fn map_key_to_tin_key(k: glfw::Key) -> Option<TinKey> {
-
     match k {
         Key::A => {return Some(TinKey::A)}
         Key::B => {return Some(TinKey::B)}

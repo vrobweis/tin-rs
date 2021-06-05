@@ -1,25 +1,23 @@
 // MARK: - Global drawing methods
 
-use crate::{
-    backends::{ArcRenderer}, color::TColor, font::TinFont,
-    Double,
-    image::TinImage,
-    point::TinPoint,
-    shapes::TinRect,
-    backends::*,
-    context::{get_tin, get_tin_mut}
-};
+use crate::{Double, backends::{ArcRenderer}, backends::*, color::TColor, context::{get_tin, get_tin_mut}, font::TinFont, image::TinImage, point::{TPoint}, shapes::TinRect};
 
+
+/* 
+    TODO: Draw calls should add to a queue of commands to help manage draw state, and prevent potential locks.
+    Each call should add to a threadsafe Queue that is then synchronously parsed by the backend. 
+    It also means that the TinContext doesn't have to maintain as much state.
+*/ 
 
 /// Clear (erase) the background
-pub fn background(red: &Double, green: &Double, blue: &Double) {
-    get_tin_mut().set_background_color(&red, &green, &blue, &1.0);
+pub fn background(red: Double, green: Double, blue: Double) {
+    get_tin_mut().set_background_color(red, green, blue, 1.0);
 }
 
 
 /// TODO: Document this function.
 pub fn background_gray(gray: Double) {
-    background(&gray, &gray, &gray)
+    background(gray, gray, gray)
 }
 
 
@@ -30,7 +28,7 @@ pub fn background_with_tin_color(color: &impl TColor) {
 
 
 /// TODO: Document this function.
-pub fn arc(x: &Double, y: &Double, radius: &Double, start_angle: &Double, end_angle: &Double) {
+pub fn arc(x: Double, y: Double, radius: Double, start_angle: Double, end_angle: Double) {
     let mut tin = get_tin_mut();
     let brush = tin.get_brush();
     let state = tin.get_state();
@@ -41,10 +39,10 @@ pub fn arc(x: &Double, y: &Double, radius: &Double, start_angle: &Double, end_an
 // Ellipse method
 
 /// Draw an ellipse. Input is centerX, centerY coordinate and width, height size.
-pub fn ellipse(center_x: &Double, center_y: &Double, width: &Double, height: &Double) {
+pub fn ellipse(center_x: Double, center_y: Double, width: Double, height: Double) {
     let x = center_x - width / 2.0;
     let y = center_y - height / 2.0;
-    let r = TinRect::new_from_dimensions( x, y, *width, *height);
+    let r = TinRect::new_from_dimensions( x, y, width, height);
     let mut tin = get_tin_mut();
     let brush = tin.get_brush();
     let state = tin.get_state();
@@ -55,18 +53,18 @@ pub fn ellipse(center_x: &Double, center_y: &Double, width: &Double, height: &Do
 // Line methods
 
 /// TODO: Document this function.
-pub fn line(x1: &Double, y1: &Double, x2: &Double, y2: &Double) {
+pub fn line(x1: Double, y1: Double, x2: Double, y2: Double) {
     let mut tin = get_tin_mut();
     let width = tin.line_width;
     let brush = tin.get_brush();
     
     let state = tin.get_state();
-    tin.render.line( x1, y1, x2, y2, &width, brush, state);
+    tin.render.line( x1, y1, x2, y2, width, brush, state);
 }
 
 
 /// TODO: Document this function.
-pub fn line_width(width: &Double) {
+pub fn line_width(width: Double) {
     let mut tin = get_tin_mut();
     tin.line_width = width.clone();
 }
@@ -75,8 +73,8 @@ pub fn line_width(width: &Double) {
 // Rectangle method
 
 /// Draw a rectangle. Input is left, bottom coordinate and width, height size.
-pub fn rect(x: &Double, y: &Double, width: &Double, height: &Double) {
-    let r = TinRect::new_from_dimensions( *x, *y, *width, *height);
+pub fn rect(x: Double, y: Double, width: Double, height: Double) {
+    let r = TinRect::new_from_dimensions( x, y, width, height);
     let mut tin = get_tin_mut();
     let brush = tin.get_brush();
     let state = tin.get_state();
@@ -85,7 +83,7 @@ pub fn rect(x: &Double, y: &Double, width: &Double, height: &Double) {
 
 
 /// Draw a rectangle with rounded corners, specified by radius_x, radius_y
-pub fn rounded_rect(rect: &TinRect, radius_x: &Double, radius_y: &Double) {
+pub fn rounded_rect(rect: &TinRect, radius_x: Double, radius_y: Double) {
     let mut tin = get_tin_mut();
     let brush = tin.get_brush();
     let state = tin.get_state();
@@ -99,7 +97,7 @@ pub fn triangle(x1: Double, y1: Double, x2: Double, y2: Double, x3: Double, y3: 
     let mut tin = get_tin_mut();
     let brush = tin.get_brush();
     let state = tin.get_state();
-    tin.render.triangle(&x1, &y1, &x2, &y2, &x3, &y3, brush, state);
+    tin.render.triangle(x1, y1, x2, y2, x3, y3, brush, state);
 }
 
 
@@ -115,18 +113,17 @@ pub fn path_begin() {
 
 
 /// Add a new point to the current path. (input 2 CGFloats)
-pub fn path_vertex(x: &Double, y: &Double) {
-    let point = TinPoint {x: *x, y: *y};
+pub fn path_vertex(x: Double, y: Double) {
     let mut tin = get_tin_mut();
-    tin.render.path_vertex( &point);
+    tin.render.path_vertex( &[x,y]);
     tin.path_vertex_count += 1;
 }
 
 
 /// Add a bezier curve to the current path
-pub fn path_add_curve(to: &TinPoint, control1: &TinPoint, control2: &TinPoint) {
+pub fn path_add_curve<P>(to: &P, control1: &P, control2: &P) where P: TPoint {
     let mut tin = get_tin_mut();
-    tin.render.path_add_curve( to, control1, control2);
+    tin.render.path_add_curve(to, control1, control2);
     tin.path_vertex_count += 4;
 }
 
@@ -142,7 +139,7 @@ pub fn path_end() {
 // MARK: - Color state
 
 /// TODO: Document this function.
-pub fn stroke_color_from_rgba(red: &Double, green: &Double, blue: &Double, alpha: &Double) {
+pub fn stroke_color_from_rgba(red: Double, green: Double, blue: Double, alpha: Double) {
     let mut tin = get_tin_mut();
     tin.stroke = true;
     tin.set_stroke_color(red, green, blue, alpha);
@@ -150,42 +147,42 @@ pub fn stroke_color_from_rgba(red: &Double, green: &Double, blue: &Double, alpha
 
 
 /// TODO: Document this function.
-pub fn stroke_color_from_gray_and_alpha(gray: &Double, alpha: &Double) {
+pub fn stroke_color_from_gray_and_alpha(gray: Double, alpha: Double) {
     stroke_color_from_rgba(gray, gray, gray, alpha);
 }
 
 
 /// TODO: Document this function.
-pub fn stroke_color_from_gray(gray: &Double) {
-    stroke_color_from_rgba(gray, gray, gray, &1.0);
+pub fn stroke_color_from_gray(gray: Double) {
+    stroke_color_from_rgba(gray, gray, gray, 1.0);
 }
 
 
 /// TODO: Document this function.
-pub fn stroke_color_from_color(color: & impl TColor) {
-    stroke_color_from_rgba( &color.get_red(), &color.get_green(), &color.get_blue(), &color.get_alpha());
+pub fn stroke_color_from_color(color: &impl TColor) {
+    stroke_color_from_rgba(color.get_red(), color.get_green(), color.get_blue(), color.get_alpha());
 }
 
 
 /// TODO: Document this function.
-pub fn fill_color_from_rgba(red: &Double, green: &Double, blue: &Double, alpha: &Double) {
+pub fn fill_color_from_rgba(red: Double, green: Double, blue: Double, alpha: Double) {
     let mut tin = get_tin_mut();
     tin.fill = true;
-    tin.set_fill_color( red, green, blue, alpha);
+    tin.set_fill_color(red, green, blue, alpha);
 }
 
 
 /// TODO: Document this function.
-pub fn fill_color_from_gray_and_alpha(gray: &Double, alpha: &Double) {
+pub fn fill_color_from_gray_and_alpha(gray: Double, alpha: Double) {
     fill_color_from_rgba(gray, gray, gray, alpha)
 }
 
 
 /// TODO: Document this function.
-pub fn fill_color_from_gray(gray: &Double) {
+pub fn fill_color_from_gray(gray: Double) {
     let mut tin = get_tin_mut();
     tin.fill = true;
-    tin.set_fill_color(gray, gray, gray, &1.0);
+    tin.set_fill_color(gray, gray, gray, 1.0);
 }
 
 
@@ -193,26 +190,24 @@ pub fn fill_color_from_gray(gray: &Double) {
 pub fn fill_color_from_color(color: &impl TColor) {
     let mut tin = get_tin_mut();
     tin.fill = true;
-    tin.set_fill_color( &color.get_red(), &color.get_green(), &color.get_blue(), &color.get_alpha());
+    tin.set_fill_color( color.get_red(), color.get_green(), color.get_blue(), color.get_alpha());
 }
 
 
 /// TODO: Document this function.
 pub fn get_stroke_color() -> impl TColor {
-    let tin = get_tin_mut();
-    return tin.get_stroke_color();
+    return get_tin().get_stroke_color();
 }
 
 
 /// TODO: Document this function.
 pub fn get_fill_color() -> impl TColor {
-    let tin = get_tin();
-    return tin.get_fill_color();
+    return get_tin().get_fill_color()
 }
 
 
 /// TODO: Document this function.
-pub fn set_alpha(alpha: &Double) {
+pub fn set_alpha(alpha: Double) {
     let mut tin = get_tin_mut();
     tin.set_alpha(alpha);
 }
@@ -258,22 +253,22 @@ pub fn pop_state() {
 
 
 /// TODO: Document this function.
-pub fn translate(dx: &Double, dy: &Double) {
+pub fn translate(dx: Double, dy: Double) {
     let mut tin = get_tin_mut();
-    tin.translation.0 += dx;
-    tin.translation.1 += dy;
+    tin.state.translation.0 += dx;
+    tin.state.translation.1 += dy;
 }
 
 
 /// TODO: Document this function.
-pub fn rotate(by_angle: &Double) {
-    get_tin_mut().rotation += by_angle;
+pub fn rotate(by_angle: Double) {
+    get_tin_mut().state.rotation += by_angle;
 }
 
 
 /// TODO: Document this function.
-pub fn scale(amount: &Double) {
-    get_tin_mut().scale += amount;
+pub fn scale(amount: Double) {
+    get_tin_mut().state.scale += amount;
 }
 
 
@@ -281,19 +276,19 @@ pub fn scale(amount: &Double) {
 
 
 /// TODO: Document this function.
-pub fn image(image: &TinImage, x: &Double, y: &Double) {
+pub fn image(image: &TinImage, x: Double, y: Double) {
     get_tin_mut().render.image(image, x, y);
 }
 
 
 /// TODO: Document this function.
-pub fn image_with_size(image: &TinImage, x: &Double, y: &Double, width: &Double, height: &Double) {
+pub fn image_with_size(image: &TinImage, x: Double, y: Double, width: Double, height: Double) {
     get_tin_mut().render.image_with_size(image, x, y, width, height);
 }
 
 
 /// TODO: Document this function.
-pub fn image_with_size_and_resize(image: &TinImage, x: &Double, y: &Double, width: &Double, height: &Double, resize: bool) {
+pub fn image_with_size_and_resize(image: &TinImage, x: Double, y: Double, width: Double, height: Double, resize: bool) {
     get_tin_mut().render.image_with_size_and_resize(image, x, y, width, height, resize);
     // Draw image at point
 }
@@ -301,7 +296,11 @@ pub fn image_with_size_and_resize(image: &TinImage, x: &Double, y: &Double, widt
 
 // MARK: - Text
 
-pub fn text(message: &String, font: &TinFont, x: &Double, y: &Double) {
+pub fn text(message: &String, font: &TinFont, x: Double, y: Double) {
     get_tin_mut().render.text(message, font, x, y);
 }
 
+
+pub fn get_frame_count() -> crate::ULong {
+    get_tin().get_frame_count()
+}

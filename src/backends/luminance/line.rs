@@ -9,10 +9,10 @@ use crate::{
 impl LineRenderer for LuminanceBackend {
 
     /// TODO: Document this method.
-    fn line(&mut self, x1: &Double, y1: &Double, x2: &Double, y2: &Double, width: &Double, brush: TBrush, state: DrawState) {
+    fn line(&mut self, x1: Double, y1: Double, x2: Double, y2: Double, width: Double, brush: TBrush, state: DrawState) {
         let relative_width = width/2.0;
-        let first_vector = TVector2::new_from_xy(*x1, *y1);
-        let second_vector = TVector2::new_from_xy(*x2, *y2);
+        let first_vector = TVector2::new_from_xy(x1, y1);
+        let second_vector = TVector2::new_from_xy(x2, y2);
 
         let mut perpendicular_clockwise_vector;
         let mut perpendicular_counter_clockwise_vector;
