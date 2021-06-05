@@ -1,3 +1,4 @@
+[![build](https://github.com/vrobweis/tin-rs/actions/workflows/build.yml/badge.svg)](https://github.com/vrobweis/tin-rs/actions/workflows/build.yml)
 # tin-rs
 A Rust language adaptation of [Loren Olson's Tin Framework](https://lnolson.github.io/Tin/), a framework in the Swift language for general media arts programming. This itself inherits from examples in The Nature of Code by Daniel Shiffman.
 
