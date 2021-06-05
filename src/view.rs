@@ -1,14 +1,10 @@
-use crate::{UInt, UShort};
-
-use super::{frame::TinFrame};
+use crate::{UInt, UShort, frame::TinFrame};
 
 pub struct TinView {
     title: &'static str,
     target_framerate: UShort,
-    pub is_running: bool,
 
-    frame: TinFrame,
-    //infoFont: TinFont
+    frame: TinFrame
 }
 
 impl TinView  {
@@ -19,9 +15,7 @@ impl TinView  {
         Self {
             title: title,
             target_framerate: 60 as UShort,
-            is_running: true,
-            frame: frame,
-            // FONT HERE
+            frame: frame
         }
         
     }

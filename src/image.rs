@@ -1,13 +1,4 @@
-//
-//  TinImage<'a>.swift
-//  Tin
-//
-//  Created by Loren Olson on 1/3/17.
-//  Created at the School of Arts, Media and Engineering,
-//  Herberger Institute for Design and the Arts,
-//  Arizona State University.
-//  Copyright (c) 2017 Arizona Board of Regents on behalf of Arizona State University
-//
+
 extern crate image;
 use image::{DynamicImage, GenericImageView, ImageError};
 
@@ -15,41 +6,23 @@ use crate::{Double, UInt, color::TColor, draw::{image, image_with_size}};
 
 pub struct TinImage {
     image: DynamicImage,
-    pub width: UInt,
-    pub height: UInt
+    pub(crate) width: UInt,
+    pub(crate) height: UInt
 }
 
 impl TinImage {
     
     pub fn new_from_image(image: DynamicImage) -> Self {
-        let w = image.width();
-        let h = image.height();
         Self {
-            image: image,
-            width: w,
-            height: h
+            width: image.width(),
+            height: image.height(),
+            image,
         }
     }
     
-    pub fn new_from_file(file_path: String) -> Result<Self, ImageError> {
-        let img = image::open(file_path);
-        let image;
-        
-        match img  {
-            Ok(i) => image = i,
-            Err(e) => return Err(e)
-        }
-        Ok(
-            {
-                let w = image.width();
-                let h = image.height();
-                Self {
-                    image: image,
-                    width: w,
-                    height: h
-                }
-            }
-        )
+    pub fn new_from_file_path(file_path: String) -> Result<Self, ImageError> {
+        let image = image::open(file_path)?;
+        Ok(Self::new_from_image(image))
     }
     
     
@@ -58,10 +31,13 @@ impl TinImage {
         return UInt::new_from_rgba(p.0[0] as Double, p.0[1] as Double, p.0[2] as Double, p.0[3] as Double);
     }
     
-    
-    
-    //func image(image: TinImage<'a>, x: Double, y: Double)
-    //func image(image: TinImage<'a>, x: Double, y: Double, width: Double, height: Double)
+    pub fn get_width(&self) -> UInt {
+        self.width
+    }
+
+    pub fn get_height(&self) -> UInt {
+        self.height
+    }
 
     pub fn draw(&self, x: Double, y: Double) {
         image(self, x, y);

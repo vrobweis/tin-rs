@@ -1,15 +1,18 @@
 
 use crate::UInt;
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct TinFrame {
     width: UInt,
     height: UInt
 }
 
+const DEFAULT_WIDTH: UInt = 600;
+const DEFAULT_HEIGHT: UInt = 480;
+
 impl Default for TinFrame {
     fn default() -> Self {
-        Self {width: 600, height: 480}
+        Self {width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT}
     }
 }
 
