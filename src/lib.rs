@@ -42,4 +42,6 @@ pub use app::*;
 pub(crate) type CurrentBackend = backends::luminance::LuminanceBackend;
 
 
-#[macro_use] pub(crate) mod tests;
+#[macro_use]
+#[cfg(test)] 
+pub(crate) mod tests;

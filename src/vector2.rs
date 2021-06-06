@@ -1,12 +1,10 @@
 use super::{Double, calculation::sqrt};
 
 
-// TODO: Implement unit tests for TVector2
-
 /**
  A structure to represent a two dimensional vector.
 */
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct TVector2 {
     pub x: Double,
     pub y: Double
@@ -17,7 +15,7 @@ pub struct TVector2 {
 impl TVector2 {
 
     // MARK: - Initializers
-    pub fn new_from_xy(x: Double, y: Double) -> Self {
+    pub const fn new_from_xy(x: Double, y: Double) -> Self {
         Self {
             x: x,
             y: y
@@ -31,6 +29,20 @@ impl TVector2 {
     /// Produces vector with magnitude 1 from angle in radians
     pub fn new_from_angle(angle: Double) -> Self {
         TVector2::new_from_xy(angle.cos(), angle.sin())
+    }
+
+    pub fn get_x(&self) -> Double {
+        self.x
+    }
+    pub fn get_y(&self) -> Double {
+        self.y
+    }
+
+    pub fn set_x(&mut self, value: Double) {
+        self.x = value
+    }
+    pub fn set_y(&mut self, value: Double) {
+        self.y = value
     }
 
     pub fn get_magnitude(&self) -> Double {
@@ -135,7 +147,9 @@ impl TVector2 {
     
 }
 
-impl std::ops::Add for TVector2 {
+use std::ops::{Add,AddAssign, Mul, MulAssign, Sub, SubAssign, Div, DivAssign, Neg};
+
+impl Add for TVector2 {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self {
@@ -143,21 +157,29 @@ impl std::ops::Add for TVector2 {
     }
 }
 
-impl std::ops::AddAssign for TVector2 {
+impl Add<Double> for TVector2 {
+    type Output = Self;
+
+    fn add(self, rhs: Double) -> Self {
+        Self { x: self.x + rhs, y: self.y + rhs}
+    }
+}
+
+impl AddAssign for TVector2 {
     fn add_assign(&mut self, rhs: Self) {
         self.x = self.x + rhs.x;
         self.y = self.y + rhs.y;
     }
 }
 
-impl std::ops::AddAssign for &mut TVector2 {
-    fn add_assign(&mut self, rhs: Self) {
-        self.x = self.x + rhs.x;
-        self.y = self.y + rhs.y;
+impl AddAssign<Double> for TVector2 {
+    fn add_assign(&mut self, rhs: Double) {
+        self.x = self.x + rhs;
+        self.y = self.y + rhs;
     }
 }
 
-impl std::ops::Div for TVector2 {
+impl Div for TVector2 {
     type Output = Self;
 
     fn div(self, rhs: Self) -> Self {
@@ -165,17 +187,30 @@ impl std::ops::Div for TVector2 {
     }
 }
 
-impl std::ops::DivAssign for TVector2 {
+impl Div<Double> for TVector2 {
+    type Output = Self;
 
+    fn div(self, rhs: Double) -> Self {
+        Self { x: self.x/rhs , y: self.y/rhs }
+    }
+}
+
+impl DivAssign for TVector2 {
     fn div_assign(&mut self, rhs: Self) {
         self.x = self.x / rhs.x;
         self.y = self.y / rhs.y;
     }
 }
 
-impl std::ops::Mul for TVector2 {
-    type Output = Self;
+impl DivAssign<Double> for TVector2 {
+    fn div_assign(&mut self, rhs: Double) {
+        self.x = self.x / rhs;
+        self.y = self.y / rhs;
+    }
+}
 
+impl Mul for TVector2 {
+    type Output = Self;
     fn mul(self, rhs: Self) -> Self {
         Self {
             x: self.x * rhs.x , y: self.y * rhs.y
@@ -183,31 +218,59 @@ impl std::ops::Mul for TVector2 {
     }
 }
 
-impl std::ops::MulAssign for TVector2 {
+impl Mul<Double> for TVector2 {
+    type Output = Self;
+    fn mul(self, rhs: Double) -> Self {
+        Self {
+            x: self.x * rhs, y: self.y * rhs
+        }
+    }
+}
+
+impl MulAssign for TVector2 {
     fn mul_assign(&mut self, rhs: Self) {
         self.x = self.x * rhs.x;
         self.y = self.y * rhs.y;
     }
 }
 
-impl std::ops::Sub for TVector2 {
-    type Output = Self;
+impl MulAssign<Double> for TVector2 {
+    fn mul_assign(&mut self, rhs: Double) {
+        self.x = self.x * rhs;
+        self.y = self.y * rhs;
+    }
+}
 
+impl Sub for TVector2 {
+    type Output = Self;
     fn sub(self, other: Self) -> Self {
         Self {x: self.x - other.x, y: self.y - other.y}
     }
 }
 
-impl std::ops::SubAssign for TVector2 {
+impl Sub<Double> for TVector2 {
+    type Output = Self;
+    fn sub(self, other: Double) -> Self {
+        Self {x: self.x - other, y: self.y - other}
+    }
+}
+
+impl SubAssign for TVector2 {
     fn sub_assign(&mut self, rhs: Self) {
         self.x = self.x - rhs.x;
         self.y = self.y - rhs.y;
     }
 }
 
-impl std::ops::Neg for TVector2 {
-    type Output = Self;
+impl SubAssign<Double> for TVector2 {
+    fn sub_assign(&mut self, rhs: Double) {
+        self.x = self.x - rhs;
+        self.y = self.y - rhs;
+    }
+}
 
+impl Neg for TVector2 {
+    type Output = Self;
     fn neg(self) -> Self::Output {
         Self {x: -self.x, y: -self.y}
     }
@@ -219,36 +282,3 @@ impl ToString for TVector2 {
     }
 }
 
-
-// MARK: - Operators
-/*
-public prefix func +(left: TVector2) -> TVector2 {
-    return left
-}
-
-public func *(left: TVector2, right: Double) -> TVector2 {
-    let x = left.x * right
-    let y = left.y * right
-    return TVector2(x: x, y: y)
-}
-
-public func *(left: Double, right: TVector2) -> TVector2 {
-    let x = left * right.x
-    let y = left * right.y
-    return TVector2(x: x, y: y)
-}
-
-public func /(left: TVector2, right: Double) -> TVector2 {
-    let x = left.x / right
-    let y = left.y / right
-    return TVector2(x: x, y: y)
-}
-
-public func *=(left: inout TVector2, right: Double) {
-    left = left * right
-}
-
-public func /=(left: inout TVector2, right: Double) {
-    left = left / right
-}
-*/
