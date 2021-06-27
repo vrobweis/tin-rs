@@ -1,14 +1,29 @@
-use crate::{Double, backends::TriangleRenderer, vector2::TVector2};
+use crate::{backends::TriangleRenderer, draw_with_brush, vector2::TinVector2};
 
 use super::NannouBackend;
 
-
-
 impl TriangleRenderer for NannouBackend {
-    fn triangle(&mut self, x1: Double, y1: Double, x2: Double, y2: Double, x3: Double, y3: Double) {
-        let point1 = TVector2::new_from_xy(*x1, *y1);
-        let point2 = TVector2::new_from_xy(*x2, *y2);
-        let point3 = TVector2::new_from_xy(*x3, *y3);
-        self.enqueue_shape(Vec::from([point1, point2, point3]));
+    fn triangle(
+        &mut self,
+        triangle: crate::shapes::TinTriangle,
+        brush: crate::brush::TBrush,
+        state: crate::context::DrawState,
+    ) {
+        let vector1 = TinVector2::from(triangle.point1);
+        let vector2 = TinVector2::from(triangle.point2);
+        let vector3 = TinVector2::from(triangle.point3);
+
+        let draw = nannou::prelude::Draw::new()
+            .scale(state.scale as f32)
+            .translate(nannou::prelude::Vector3::<f32>::new(
+                state.translation.0 as f32,
+                state.translation.1 as f32,
+                0.0,
+            ))
+            .rotate(state.rotation as f32);
+
+        let d = draw.tri().points(vector1, vector2, vector3);
+
+        draw_with_brush!(d, brush);
     }
 }

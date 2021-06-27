@@ -1,23 +1,46 @@
-use crate::{Double, backends::{RectRenderer, luminance::LuminanceBackend}, context::{DrawState, TBrush}, point::{TPoint, TinPoint}, shapes::TinRect, vector2::TVector2};
-
+use crate::{
+    backends::luminance::LuminanceBackend,
+    context::DrawState,
+    point::{TPoint, TinPoint},
+    shapes::{RectRenderer, TinRect, TinRoundedRect},
+    vector2::TinVector2,
+    Double,
+};
 
 impl RectRenderer for LuminanceBackend {
-
-    fn rect_with_tinrect(&mut self, with_rect: &TinRect, brush: TBrush, state: DrawState) {
-        let bottom_left_point = TinPoint::new_from_coords(with_rect.x, with_rect.y);
+    fn rect_with_tinrect(
+        &mut self,
+        with_rect: &TinRect,
+        brush: crate::brush::TBrush,
+        state: DrawState,
+    ) {
+        let center = TinPoint::from_coords(with_rect.center.get_x(), with_rect.center.get_y());
 
         let width = with_rect.get_width();
         let height = with_rect.get_height();
 
-        let point1 = TVector2::new_from_xy(bottom_left_point.get_x(), bottom_left_point.get_y());
-        let point2 = TVector2::new_from_xy(bottom_left_point.get_x(), bottom_left_point.get_y() + height);
-        let point3 = TVector2::new_from_xy(bottom_left_point.get_x() + width, bottom_left_point.get_y() + height);
-        let point4 = TVector2::new_from_xy(bottom_left_point.get_x() + width, bottom_left_point.get_y());
+        let w_offset = width / 2 as Double;
+        let h_offset = height / 2 as Double;
 
-        self.enqueue_shape(Vec::from([point1.clone(),point2,point3,point4,point1]), brush, state);
+        let bottom_left = TinVector2::from_xy(center.get_x() - w_offset, center.get_y() - h_offset);
+        let top_left = TinVector2::from_xy(center.get_x() - w_offset, center.get_y() + h_offset);
+        let top_right = TinVector2::from_xy(center.get_x() + w_offset, center.get_y() + h_offset);
+        let bottom_right =
+            TinVector2::from_xy(center.get_x() + w_offset, center.get_y() - h_offset);
+
+        self.enqueue_shape(
+            Vec::from([bottom_left, top_left, top_right, bottom_right, bottom_left]),
+            brush,
+            state,
+        );
     }
 
-    fn rounded_rect(&mut self, rect: &TinRect, radius_x: Double, radius_y: Double, brush: TBrush, state: DrawState) {
+    fn rounded_rect(
+        &mut self,
+        rounded_rect: &TinRoundedRect,
+        brush: crate::brush::TBrush,
+        state: DrawState,
+    ) {
         todo!("rounded_rect method in LuminanceBackend not supported yet");
     }
 }

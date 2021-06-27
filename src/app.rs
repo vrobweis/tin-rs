@@ -1,21 +1,29 @@
-use crate::{CurrentBackend, event::TEventHandler, scene::TScene, view::TinView, backends::TBackend};
+use crate::{
+    backends::TBackend,
+    scene::TScene,
+    view::{TView, TinView},
+    CurrentBackend, UShort,
+};
 
-pub struct TinApp<S> where S: TScene {
-    pub(crate) scene: S,
-    pub(crate) handler: TEventHandler<S>,
-    pub(crate) view: TinView
+pub struct Tin<S>
+where
+    S: TScene + 'static,
+{
+    pub(crate) view: TinView,
+    pub(crate) target_fps: UShort,
+    phantom: std::marker::PhantomData<S>,
 }
 
-impl<S> TinApp<S> where S: TScene {
-    pub fn app(scene: S) -> Self {
-        TinApp{
-            scene, handler: |_,_,_| {}, view: TinView::new("Default Title", crate::frame::TinFrame::default())
+impl<S> Tin<S>
+where
+    S: TScene,
+{
+    pub fn app() -> Self {
+        Tin {
+            view: TinView::new("Default Title", crate::frame::TinFrame::default()),
+            target_fps: 60,
+            phantom: std::marker::PhantomData,
         }
-    }
-
-    pub fn event(mut self, event_handler: TEventHandler<S>) -> Self {
-        self.handler = event_handler;
-        self
     }
 
     pub fn view(mut self, view: TinView) -> Self {
@@ -23,12 +31,21 @@ impl<S> TinApp<S> where S: TScene {
         self
     }
 
-    pub fn run(mut self) -> Result<(), ()> {
-        self.scene.setup();
+    pub fn run(self) -> Result<(), ()> {
         {
             let frame = self.view.get_frame().clone();
             crate::context::get_tin_mut().prepare(frame)
         }
-        CurrentBackend::run(self)
+        CurrentBackend::run::<S>(self)
+    }
+
+    /// TODO: Document this method.
+    pub fn get_fps(&self) -> UShort {
+        self.target_fps
+    }
+
+    /// TODO: Document this method.
+    pub fn set_fps(&mut self, fps: UShort) {
+        self.target_fps = fps;
     }
 }

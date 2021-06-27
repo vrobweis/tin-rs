@@ -1,16 +1,15 @@
 use crate::{
-    Double, 
-    backends::{TriangleRenderer, luminance::LuminanceBackend}, 
-    context::{DrawState, TBrush}, 
-    vector2::TVector2
+    backends::{luminance::LuminanceBackend, TriangleRenderer},
+    context::DrawState,
+    shapes::TinTriangle,
+    vector2::TinVector2,
 };
 
-
 impl TriangleRenderer for LuminanceBackend {
-    fn triangle(&mut self, x1: Double, y1: Double, x2: Double, y2: Double, x3: Double, y3: Double, brush: TBrush, state: DrawState) {
-        let point1 = TVector2::new_from_xy(x1, y1);
-        let point2 = TVector2::new_from_xy(x2, y2);
-        let point3 = TVector2::new_from_xy(x3, y3);
-        self.enqueue_shape(Vec::from([point1, point2, point3]), brush, state);
+    fn triangle(&mut self, triangle: TinTriangle, brush: crate::brush::TBrush, state: DrawState) {
+        let vector1 = TinVector2::from(triangle.point1);
+        let vector2 = TinVector2::from(triangle.point2);
+        let vector3 = TinVector2::from(triangle.point3);
+        self.enqueue_shape(Vec::from([vector1, vector2, vector3]), brush, state);
     }
 }

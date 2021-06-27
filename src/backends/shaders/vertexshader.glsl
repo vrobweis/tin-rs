@@ -1,9 +1,9 @@
 // those are our vertex attributes
 in vec2 position;
-in vec3 color;
+in vec4 color;
 
 // this is the output of the vertex shader (we could have had several ones)
-out vec3 v_color;
+out vec4 v_color;
 
 void main() {
   // simply forward the color

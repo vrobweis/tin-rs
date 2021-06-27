@@ -1,15 +1,17 @@
 use crate::{
-    Double,
-    backends::{TextRenderer, luminance::LuminanceBackend},
-    font::TinFont
+    backends::luminance::LuminanceBackend,
+    point::TinPoint,
+    text::{TextRenderer, TinFont},
 };
 
-
 impl TextRenderer for LuminanceBackend {
-    
-    fn text(&mut self, message: &String, font: &TinFont, x: Double, y: Double) {
+    fn text(
+        &mut self,
+        message: &String,
+        font: &TinFont,
+        center: TinPoint,
+        state: crate::context::DrawState,
+    ) {
         todo!("text method in LuminanceBackend not supported yet");
     }
-
 }
-

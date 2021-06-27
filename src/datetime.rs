@@ -1,7 +1,5 @@
-
-use chrono::{Datelike, Timelike, prelude::Utc};
 use crate::{Int, Long, UInt};
-
+use chrono::{prelude::Utc, Datelike, Timelike};
 
 pub fn year() -> Int {
     Utc::now().year()
@@ -34,4 +32,3 @@ pub fn millis() -> Long {
 pub fn nanosecond() -> UInt {
     Utc::now().nanosecond()
 }
-

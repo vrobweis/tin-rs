@@ -1,6 +1,6 @@
 [package]
 name = "tin-rs"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Vincent Robert Weis <vrobweis@gmail.com>"]
 edition = "2018"
 
@@ -10,32 +10,40 @@ path = "src/lib.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[[example]]
-name = "triangle_particles"
-path = "examples/particles.rs"
-
-
 [dependencies]
 # Used for backends
-nannou = "0.16.0"
-luminance = "0.43.2"
-luminance-front = "0.3.1"
-luminance-glfw = "0.15"
-luminance-gl = "0.16.1"
-luminance-glutin = "0.11.3"
-luminance-windowing = "0.9"
-luminance-derive = "0.6"
-glfw = "0.41"
-glutin = "0.26"
+nannou = {version = "0.16.0", optional = true}
+luminance = {version = "0.43.2", optional = true}
+luminance-front = {version = "0.3.1", optional = true}
+luminance-glfw = {version = "0.15", optional = true}
+luminance-gl = {version = "0.16.1", optional = true}
+luminance-glutin = {version = "0.11.3", optional = true}
+luminance-windowing = {version = "0.9", optional = true}
+luminance-derive = {version = "0.6", optional = true}
+glfw = {version = "0.41", optional = true}
+glutin = {version =  "0.26", optional = true}
 
 # Used for features
-image = "0.23.14"
-chrono = "0.4"
-font-kit = {version = "0.10.0", features = ["loader-freetype"] } 
-rand = "0.8.3"
+image = {version = "0.23.14", optional = true}
+chrono = {version = "0.4", optional = true}
+font-kit = {version = "0.10.0", features = ["loader-freetype"], optional = true }
+luminance-glyph = {version = "0.2.0", optional = true}
+rand = {version = "0.8.3", optional = true}
 
-# Used for global state
+# Used for lazily evaluated global delegate
 lazy_static = "1.4.0"
 
 # Used for testing
 assert_approx_eq = "1.1.0"
+
+[features]
+text = ["font-kit", "luminance-glyph"]
+luminance_backend = ["luminance", "luminance-front", "luminance-glfw", "luminance-gl", "luminance-glutin", "luminance-windowing", "luminance-derive", "glfw", "glutin"]
+time = ["chrono"]
+default = ["rand", "time", "nannou"]
+
+
+[[example]]
+name = "triangle_particles"
+path = "examples/particles.rs"
+features = ["rand", "nannou"]

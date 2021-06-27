@@ -1,13 +1,28 @@
-
-use crate::{Double, calculation::{sq, sqrt}, private::Sealed};
+use crate::{
+    calculation::{sq, sqrt},
+    private::Sealed,
+    Double, TinVector2,
+};
 pub trait TPoint: Sealed {
-    fn new_from_coords(x: Double, y: Double) -> Self;
+    fn from_coords(x: Double, y: Double) -> Self;
 
     fn set_x(&mut self, x: Double);
     fn set_y(&mut self, y: Double);
 
     fn get_x(&self) -> Double;
     fn get_y(&self) -> Double;
+
+    fn translate(&mut self, dx: Double, dy: Double) {
+        self.set_x(self.get_x() + dx);
+        self.set_y(self.get_y() + dy);
+    }
+
+    fn rotate_around_origin(&mut self, theta: Double) {
+        let mut v = TinVector2::from_xy(self.get_x(), self.get_y());
+        v.rotate(theta);
+        self.set_x(v.x);
+        self.set_y(v.y);
+    }
 
     fn set_polar_angle(&mut self, theta: Double) {
         self.set_x(self.get_polar_radius() * theta.cos());
@@ -26,14 +41,14 @@ pub trait TPoint: Sealed {
     }
 }
 
-
+#[derive(Debug, Clone)]
 pub struct TinPoint {
     x: Double,
-    y: Double
+    y: Double,
 }
 
 impl TPoint for TinPoint {
-    fn new_from_coords(x: Double, y: Double) -> Self {
+    fn from_coords(x: Double, y: Double) -> Self {
         Self { x: x, y: y }
     }
 
@@ -52,28 +67,18 @@ impl TPoint for TinPoint {
     fn get_y(&self) -> Double {
         self.y
     }
-
 }
 impl Sealed for TinPoint {}
 
 impl Default for TinPoint {
     fn default() -> Self {
-        TinPoint::new_from_coords(0.0, 0.0)
-    }
-}
-
-impl Clone for TinPoint {
-    fn clone(&self) -> Self {
-        Self {
-            x: self.x,
-            y: self.y
-        }
+        TinPoint::from_coords(0.0, 0.0)
     }
 }
 
 impl TPoint for (Double, Double) {
-    fn new_from_coords(x: Double, y: Double) -> Self {
-        (x,y)
+    fn from_coords(x: Double, y: Double) -> Self {
+        (x, y)
     }
 
     fn set_x(&mut self, x: Double) {
@@ -95,8 +100,8 @@ impl TPoint for (Double, Double) {
 impl Sealed for (Double, Double) {}
 
 impl TPoint for [Double; 2] {
-    fn new_from_coords(x: Double, y: Double) -> Self {
-        [x,y]
+    fn from_coords(x: Double, y: Double) -> Self {
+        [x, y]
     }
 
     fn set_x(&mut self, x: Double) {
@@ -124,7 +129,7 @@ enum TinAngle {
     Grad(Double),
     Rad(Double)
 }
-  
+
 enum TinPoint {
     Cartesian(i64, i64),
     Polar(Double, Angle)

@@ -1,40 +1,37 @@
-use crate::{Double, backends::RectRenderer, point::TinPoint, shapes::TinRect, vector2::TVector2};
+use crate::{backends::RectRenderer, point::TPoint, shapes::TinRect};
 
 use super::NannouBackend;
 
-
-
 impl RectRenderer for NannouBackend {
-    fn rect(&mut self, x: Double, y: Double, w: Double, h: Double) {    
-        eprintln!("NannouBackend::rect()");
-        self.rect_with_tinrect(&TinRect::new_from_dimensions(*x, *y, *w, *h));
-    }
-
-    fn rect_with_tinrect(&mut self, with_rect: &TinRect) {
-        eprintln!("NannouBackend::rect_with_tinrect()");
-        let bottom_left_point = TinPoint::new_from_coords(with_rect.x, with_rect.y);
-
-        let width = with_rect.get_width();
-        let height = with_rect.get_height();
-
-        let point1 = TVector2::new_from_xy(bottom_left_point.x, bottom_left_point.y);
-        let point2 = TVector2::new_from_xy(bottom_left_point.x, bottom_left_point.y + height);
-        let point3 = TVector2::new_from_xy(bottom_left_point.x + width, bottom_left_point.y + height);
-        let point4 = TVector2::new_from_xy(bottom_left_point.x + width, bottom_left_point.y);
-
-        self.enqueue_shape(Vec::from([point1.clone(),point2,point3,point4,point1]));
-    }
-    
-    fn rounded_rect(&mut self, rect: &TinRect, radius_x: Double, radius_y: Double) {
+    fn rounded_rect(
+        &mut self,
+        rounded_rect: &crate::shapes::TinRoundedRect,
+        brush: crate::brush::TBrush,
+        state: crate::context::DrawState,
+    ) {
         todo!("rounded_rect method in NannouBackend not supported yet");
-        /* 
-        let bezier = NSBezierPath(rounded_rect: rect, radius_x: CGFloat(radius_x), radius_y: CGFloat(radius_y))
-        if delegate.fill {
-            bezier.fill()
-        }
-        if delegate.stroke {
-            bezier.stroke()
-        }
-        */
+    }
+
+    fn rect_with_tinrect(
+        &mut self,
+        with_rect: &TinRect,
+        brush: crate::brush::TBrush,
+        state: crate::context::DrawState,
+    ) {
+        let center = &with_rect.center;
+        let draw = nannou::prelude::Draw::new()
+            .scale(state.scale as f32)
+            .translate(nannou::prelude::Vector3::<f32>::new(
+                state.translation.0 as f32,
+                state.translation.1 as f32,
+                0.0,
+            ))
+            .rotate(state.rotation as f32);
+        let rect = draw
+            .rect()
+            .w_h(with_rect.get_width() as f32, with_rect.get_height() as f32)
+            .x_y(center.get_x() as f32, center.get_y() as f32);
+
+        crate::draw_with_brush!(rect, brush);
     }
 }

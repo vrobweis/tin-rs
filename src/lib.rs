@@ -1,26 +1,46 @@
-#[path = "backends/backends.rs"] pub(crate) mod backends;
+#[deny(missing_docs)]
+#[path = "backends/backends.rs"]
+pub(crate) mod backends;
 
 pub mod calculation;
+#[cfg(time)]
 pub mod datetime;
 pub mod draw;
 pub mod easing;
+
 pub mod event;
+pub use event::TinEvent;
+
 pub mod key;
+pub use key::TinKey;
+
 pub mod noise;
+
+pub(crate) mod brush;
+
 pub mod color;
+pub use color::{TColor, TinColor};
+
 pub(crate) mod context;
-pub mod font;
 pub mod frame;
+#[cfg(image)]
 pub mod image;
 pub mod point;
+#[cfg(rand)]
 pub mod random; //TODO: Implement TRandom
 pub mod scene;
 pub mod shapes;
 pub mod stopwatch;
-pub mod vector2;
-pub(crate) mod vertex;
-pub mod view;
+#[cfg(text)]
+pub mod text;
 
+pub mod vector2;
+pub use vector2::TinVector2;
+
+
+pub(crate) mod vertex;
+
+pub mod view;
 
 pub type Double = f64;
 pub type Float = f32;
@@ -38,10 +58,8 @@ pub(crate) mod private {
 pub(crate) mod app;
 pub use app::*;
 
-
-pub(crate) type CurrentBackend = backends::luminance::LuminanceBackend;
-
+pub(crate) type CurrentBackend = backends::nannou::NannouBackend;
 
 #[macro_use]
-#[cfg(test)] 
+#[cfg(test)]
 pub(crate) mod tests;

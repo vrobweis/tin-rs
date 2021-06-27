@@ -1,14 +1,18 @@
 use crate::{
-    Double, 
-    backends::{EllipseRenderer, luminance::LuminanceBackend}, 
-    context::{DrawState, TBrush}
+    backends::{luminance::LuminanceBackend, EllipseRenderer},
+    context::DrawState,
+    Double,
 };
 
 impl EllipseRenderer for LuminanceBackend {
-
-    fn ellipse(&mut self, x: Double, y: Double, w: Double, h: Double, brush: TBrush, state: DrawState) {
+    fn ellipse(
+        &mut self,
+        center: crate::point::TinPoint,
+        w: Double,
+        h: Double,
+        brush: crate::brush::TBrush,
+        state: DrawState,
+    ) {
         todo!("Ellipse render for LuminanceBackend not implemented");
     }
-
 }
-
