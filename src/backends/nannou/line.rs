@@ -24,8 +24,35 @@ impl LineRenderer for NannouBackend {
             ))
             .rotate(state.rotation as f32);
 
-        let d = draw.line().points(vector1, vector2).weight(width as f32);
+        let drawing = draw.line().points(vector1, vector2).weight(width as f32);
 
-        todo!("line method for Nannou backend not implemented");
+        match brush {
+            crate::brush::TBrush::Stroke(ref c) => {
+                drawing.rgba(
+                    <crate::color::TinColor as crate::color::TColor>::get_red(c) as f32,
+                    <crate::color::TinColor as crate::color::TColor>::get_green(c) as f32,
+                    <crate::color::TinColor as crate::color::TColor>::get_blue(c) as f32,
+                    <crate::color::TinColor as crate::color::TColor>::get_alpha(c) as f32,
+                );
+            }
+            crate::brush::TBrush::FillAndStroke(_f, ref s) => {
+                drawing
+                    .rgba(
+                        <crate::color::TinColor as crate::color::TColor>::get_red(s) as f32,
+                        <crate::color::TinColor as crate::color::TColor>::get_green(s) as f32,
+                        <crate::color::TinColor as crate::color::TColor>::get_blue(s) as f32,
+                        <crate::color::TinColor as crate::color::TColor>::get_alpha(s) as f32,
+                    );
+            }
+            crate::brush::TBrush::Disabled => {
+                drawing.rgba(
+                    0.0 as f32,
+                    0.0 as f32,
+                    0.0 as f32,
+                    0.0 as f32,
+                );
+            }
+            _ => {}
+        };
     }
 }
