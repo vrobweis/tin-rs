@@ -220,10 +220,10 @@ pub fn scale(amount: Double) {
 }
 
 // MARK: - Image
-#[cfg(image)]
+#[cfg(feature = "image")]
 use crate::image::TinImage;
 /// TODO: Document this function.
-#[cfg(image)]
+#[cfg(feature = "image")]
 pub fn image(image: &'static TinImage, x: Double, y: Double) {
     image_with_size(
         image,
@@ -235,7 +235,7 @@ pub fn image(image: &'static TinImage, x: Double, y: Double) {
 }
 
 /// TODO: Document this function.
-#[cfg(image)]
+#[cfg(feature = "image")]
 pub fn image_with_size(
     image: &'static TinImage,
     x: Double,
@@ -247,7 +247,7 @@ pub fn image_with_size(
 }
 
 /// TODO: Document this function.
-#[cfg(image)]
+#[cfg(feature = "image")]
 pub fn image_with_size_and_resize(
     image: &'static TinImage,
     x: Double,
@@ -266,8 +266,8 @@ pub fn image_with_size_and_resize(
     }))
 }
 
-#[cfg(text)]
-pub fn text(message: &String, font: &TinFont, x: Double, y: Double) {
+#[cfg(feature = "text")]
+pub fn text(message: &String, font: &crate::text::TinFont, x: Double, y: Double) {
     use crate::text::*;
     let center = TinPoint::from_coords(x, y);
     let f = font.clone();
@@ -293,21 +293,21 @@ pub(crate) struct PathAddCurveCall {
     pub control2: (Double, Double),
 }
 
-#[cfg(image)]
+#[cfg(feature = "image")]
 #[derive(Debug)]
 pub(crate) struct ImageCall {
-    pub image: &'static TinImage,
+    pub image: &'static crate::image::TinImage,
     pub center: TinPoint,
     pub width: Double,
     pub height: Double,
     pub resize: bool,
 }
 
-#[cfg(text)]
+#[cfg(feature = "text")]
 #[derive(Debug)]
 pub(crate) struct TextCall {
     message: String,
-    font: TinFont,
+    font: crate::text::TinFont,
     pub center: TinPoint,
 }
 
@@ -345,9 +345,9 @@ pub(crate) enum DrawCall {
     Rotate(Double),
     Scale(Double),
 
-    #[cfg(image)]
+    #[cfg(feature = "image")]
     Image(ImageCall),
 
-    #[cfg(text)]
+    #[cfg(feature = "text")]
     Text(TextCall),
 }

@@ -1,6 +1,4 @@
-use crate::{backends::PathRenderer, point::TPoint};
-
-use super::NannouBackend;
+use crate::{backends::{PathRenderer, nannou::NannouBackend}, point::TPoint};
 
 impl PathRenderer for NannouBackend {
     // MARK: - Path stuff

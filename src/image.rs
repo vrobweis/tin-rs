@@ -7,6 +7,7 @@ use crate::{
     Double, UInt,
 };
 
+#[derive(Debug)]
 pub struct TinImage {
     pub(crate) image: DynamicImage,
 }

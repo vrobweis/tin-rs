@@ -1,12 +1,12 @@
 pub(crate) mod arc;
 pub(crate) mod ellipse;
-#[cfg(image)]
+#[cfg(feature = "image")]
 pub(crate) mod image;
 pub(crate) mod line;
 pub(crate) mod path;
 pub(crate) mod rect;
 pub(crate) mod state;
-#[cfg(text)]
+#[cfg(feature = "text")]
 pub(crate) mod text;
 pub(crate) mod triangle;
 
@@ -34,6 +34,12 @@ pub struct NannouBackend {
     pub use_layer: bool,
 
     path_vertices: Queue<TinVertex>,
+}
+
+impl NannouBackend {
+    fn get_draw(&self) -> Draw {
+        nannou::Draw::new()
+    }
 }
 
 #[macro_export]

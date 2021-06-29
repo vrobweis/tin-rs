@@ -1,5 +1,4 @@
-use super::NannouBackend;
-use crate::{backends::TextRenderer, point::TPoint};
+use crate::{backends::{TextRenderer, nannou::NannouBackend}, point::TPoint};
 
 impl TextRenderer for NannouBackend {
     fn text(
@@ -10,7 +9,7 @@ impl TextRenderer for NannouBackend {
         state: crate::context::DrawState,
     ) {
         let draw = self
-            .draw
+            .get_draw()
             .scale(state.scale as f32)
             .translate(nannou::prelude::Vector3::<f32>::new(
                 state.translation.0 as f32,

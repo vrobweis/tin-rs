@@ -1,6 +1,4 @@
-use crate::backends::ImageRenderer;
-
-use super::NannouBackend;
+use crate::backends::{ImageRenderer, nannou::NannouBackend};
 
 impl ImageRenderer for NannouBackend {
     fn image_with_size_and_resize(
@@ -13,7 +11,7 @@ impl ImageRenderer for NannouBackend {
         state: crate::context::DrawState,
     ) {
         let draw = self
-            .draw
+            .get_draw()
             .scale(state.scale as f32)
             .translate(nannou::prelude::Vector3::<f32>::new(
                 state.translation.0 as f32,

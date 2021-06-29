@@ -1,6 +1,4 @@
-use crate::{backends::TriangleRenderer, draw_with_brush, vector2::TinVector2};
-
-use super::NannouBackend;
+use crate::{backends::{TriangleRenderer, nannou::NannouBackend}, draw_with_brush, vector2::TinVector2};
 
 impl TriangleRenderer for NannouBackend {
     fn triangle(

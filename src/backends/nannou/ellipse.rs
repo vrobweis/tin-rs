@@ -1,6 +1,4 @@
-use crate::{backends::EllipseRenderer, point::TPoint};
-
-use super::NannouBackend;
+use crate::{backends::{EllipseRenderer, nannou::NannouBackend}, point::TPoint};
 
 impl EllipseRenderer for NannouBackend {
     fn ellipse(

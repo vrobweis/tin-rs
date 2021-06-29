@@ -3,7 +3,7 @@
 pub(crate) mod backends;
 
 pub mod calculation;
-#[cfg(time)]
+#[cfg(feature = "time")]
 pub mod datetime;
 pub mod draw;
 pub mod easing;
@@ -23,15 +23,15 @@ pub use color::{TColor, TinColor};
 
 pub(crate) mod context;
 pub mod frame;
-#[cfg(image)]
+#[cfg(feature = "image")]
 pub mod image;
 pub mod point;
-#[cfg(rand)]
+#[cfg(feature = "random")]
 pub mod random; //TODO: Implement TRandom
 pub mod scene;
 pub mod shapes;
 pub mod stopwatch;
-#[cfg(text)]
+#[cfg(feature = "text")]
 pub mod text;
 
 pub mod vector2;

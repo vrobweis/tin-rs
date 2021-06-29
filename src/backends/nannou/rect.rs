@@ -1,6 +1,4 @@
-use crate::{backends::RectRenderer, point::TPoint, shapes::TinRect};
-
-use super::NannouBackend;
+use crate::{backends::{RectRenderer, nannou::NannouBackend}, point::TPoint, shapes::TinRect};
 
 impl RectRenderer for NannouBackend {
     fn rounded_rect(

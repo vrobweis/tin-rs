@@ -8,6 +8,11 @@ edition = "2018"
 name = "tin"
 path = "src/lib.rs"
 
+[[example]]
+name = "particles"
+path = "examples/particles.rs"
+crate-type = ["bin"]
+required-features = ["default", "random"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
@@ -37,13 +42,8 @@ lazy_static = "1.4.0"
 assert_approx_eq = "1.1.0"
 
 [features]
+random = ["rand"]
 text = ["font-kit", "luminance-glyph"]
 luminance_backend = ["luminance", "luminance-front", "luminance-glfw", "luminance-gl", "luminance-glutin", "luminance-windowing", "luminance-derive", "glfw", "glutin"]
 time = ["chrono"]
-default = ["rand", "time", "nannou"]
-
-
-[[example]]
-name = "triangle_particles"
-path = "examples/particles.rs"
-features = ["rand", "nannou"]
+default = ["random", "time", "nannou"]

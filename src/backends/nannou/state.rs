@@ -1,6 +1,4 @@
-use crate::backends::StatefulRenderer;
-
-use super::NannouBackend;
+use crate::backends::{StatefulRenderer, nannou::NannouBackend};
 
 impl StatefulRenderer for NannouBackend {
     // MARK: - Context state

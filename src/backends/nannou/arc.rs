@@ -1,6 +1,4 @@
-use crate::backends::ArcRenderer;
-
-use super::NannouBackend;
+use crate::backends::{ArcRenderer, nannou::NannouBackend};
 
 impl ArcRenderer for NannouBackend {
     fn arc(

@@ -12,10 +12,10 @@ use crate::{
     Tin,
 };
 
-#[cfg(text)]
+#[cfg(feature = "text")]
 use crate::text::TextRenderer;
 
-#[cfg(image)]
+#[cfg(feature = "image")]
 use crate::image::*;
 
 const VS_STR: &str = include_str!("shaders/vertexshader.glsl");
@@ -69,14 +69,14 @@ pub(crate) trait StatefulRenderer {
     */
 }
 
-#[cfg(not(image))]
+#[cfg(not(feature = "image"))]
 pub(crate) trait ImageRenderer {}
 
-#[cfg(not(image))]
+#[cfg(not(feature = "image"))]
 impl<T> ImageRenderer for T where T: TinRenderer {}
 
-#[cfg(not(text))]
+#[cfg(not(feature = "text"))]
 pub(crate) trait TextRenderer {}
 
-#[cfg(not(text))]
+#[cfg(not(feature = "text"))]
 impl<T> TextRenderer for T where T: TinRenderer {}

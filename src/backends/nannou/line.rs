@@ -1,6 +1,4 @@
-use crate::{backends::LineRenderer, vector2::TinVector2, Double};
-
-use super::NannouBackend;
+use crate::{backends::{LineRenderer, nannou::NannouBackend}, vector2::TinVector2, Double};
 
 impl LineRenderer for NannouBackend {
     // Draw line with previously set line width
