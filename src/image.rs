@@ -32,6 +32,31 @@ impl TinImage {
         );
     }
 
+    pub fn color_rows<T: TColor>(&self) -> Vec<Vec<T>> {
+        let (width, height) = (self.image.width(), self.image.height());
+        let rows = (0..height).into_iter()
+            .map(
+                |y| {
+                    let mut row = Vec::with_capacity(width as usize);
+                    for x in 0..width {
+                        row.push(
+                            {
+                                let p = self.image.get_pixel(x, y);
+                                T::from_rgba(
+                                    p.0[0] as Double,
+                                    p.0[1] as Double,
+                                    p.0[2] as Double,
+                                    p.0[3] as Double,
+                                )
+                            }
+                        )
+                    };
+                    row
+                }
+            ).collect();
+        return rows
+    }
+
     pub fn get_width(&self) -> UInt {
         self.image.width()
     }
