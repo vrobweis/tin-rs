@@ -1,8 +1,8 @@
 [package]
 name = "tin-rs"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Vincent Robert Weis <vrobweis@gmail.com>"]
-edition = "2018"
+edition = "2021"
 
 [lib]
 name = "tin"
@@ -17,16 +17,16 @@ required-features = ["default", "random"]
 
 [dependencies]
 # Used for backends
-nannou = {version = "0.16.0", optional = true}
-luminance = {version = "0.43.2", optional = true}
-luminance-front = {version = "0.3.1", optional = true}
-luminance-glfw = {version = "0.15", optional = true}
-luminance-gl = {version = "0.16.1", optional = true}
-luminance-glutin = {version = "0.11.3", optional = true}
-luminance-windowing = {version = "0.9", optional = true}
-luminance-derive = {version = "0.6", optional = true}
-glfw = {version = "0.41", optional = true}
-glutin = {version =  "0.26", optional = true}
+nannou = {version = "0.17.1", optional = true}
+luminance = {version = "0.44.1", optional = true}
+luminance-front = {version = "0.4.0", optional = true}
+luminance-glfw = {version = "0.16.0", optional = true}
+luminance-gl = {version = "0.17.0", optional = true}
+luminance-glutin = {version = "0.12.0", optional = true}
+luminance-windowing = {version = "0.10.0", optional = true}
+luminance-derive = {version = "0.7.0", optional = true}
+glfw = {version = "0.42", optional = true}
+glutin = {version =  "0.27", optional = true}
 
 # Used for features
 image = {version = "0.23.14", optional = true}

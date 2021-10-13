@@ -19,7 +19,7 @@ impl RectRenderer for NannouBackend {
         let center = &with_rect.center;
         let draw = nannou::prelude::Draw::new()
             .scale(state.scale as f32)
-            .translate(nannou::prelude::Vector3::<f32>::new(
+            .translate(nannou::prelude::vec3(
                 state.translation.0 as f32,
                 state.translation.1 as f32,
                 0.0,

@@ -43,6 +43,7 @@ impl NannouBackend {
 }
 
 #[macro_export]
+/// Macro to shorten the process of setting the draw color for a Nannou Draw instance.
 macro_rules! draw_with_brush {
     ($draw:ident, $brush:ident) => {
         match $brush {
